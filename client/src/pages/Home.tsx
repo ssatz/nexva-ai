@@ -1,25 +1,35 @@
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { Streamdown } from 'streamdown';
+/*
+  Home — Nexva.ai workspace shell.
+  Quiet Studio: warm off-white canvas, hairline divider, lower-third composer.
+  Single-page client routing across {chat | image | search | tasks} via AppShell.
+*/
 
-/**
- * All content in this page are only for example, replace with your own feature implementation
- * When building pages, remember your instructions in Frontend Best Practices, Design Guide and Common Pitfalls
- */
+import { useState } from "react";
+import { AppShell, type NavKey } from "@/components/AppShell";
+import { ChatView } from "@/components/views/ChatView";
+import { ImageGenView } from "@/components/views/ImageGenView";
+import { SearchView } from "@/components/views/SearchView";
+import { TasksView } from "@/components/views/TasksView";
+import { toast } from "sonner";
+
 export default function Home() {
-  // If theme is switchable in App.tsx, we can implement theme toggling like this:
-  // const { theme, toggleTheme } = useTheme();
+  const [active, setActive] = useState<NavKey>("chat");
+  // Bump key to force-remount the active view → resets local message/task state
+  const [resetTick, setResetTick] = useState(0);
+
+  function newSession() {
+    setResetTick((n) => n + 1);
+    toast("New session", {
+      description: "Started a clean slate in the current workspace.",
+    });
+  }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <main>
-        {/* Example: lucide-react for icons */}
-        <Loader2 className="animate-spin" />
-        Example Page
-        {/* Example: Streamdown for markdown rendering */}
-        <Streamdown>Any **markdown** content</Streamdown>
-        <Button variant="default">Example Button</Button>
-      </main>
-    </div>
+    <AppShell active={active} onNavigate={setActive} onNewSession={newSession}>
+      {active === "chat"   && <ChatView   key={`chat-${resetTick}`} />}
+      {active === "image"  && <ImageGenView key={`image-${resetTick}`} />}
+      {active === "search" && <SearchView   key={`search-${resetTick}`} />}
+      {active === "tasks"  && <TasksView    key={`tasks-${resetTick}`} />}
+    </AppShell>
   );
 }
