@@ -1,13 +1,13 @@
 /*
-  ImageGenView — Quiet Studio surface for prompt-based image generation.
-  Layout: prompt at top, gallery grid below. No real generation backend wired —
-  the "generate" action enqueues a placeholder card and shows a toast.
+  ImageGenView — B&W minimal, Runable-style centered hero with a chip-based
+  aspect selector below the composer. Generated cards are monochrome.
 */
 
 import { useState } from "react";
 import { ChatComposer } from "@/components/ChatComposer";
 import { toast } from "sonner";
 import { Image as ImageIcon, Aperture } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface GenItem {
   id: string;
@@ -32,39 +32,40 @@ export function ImageGenView() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="flex items-center justify-between px-8 pt-6">
-        <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-          Workspace · Image Gen
-        </div>
-        <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1">
-          {ASPECT_OPTIONS.map((a) => (
-            <button
-              key={a}
-              onClick={() => setAspect(a)}
-              className={`rounded-full px-2.5 py-1 font-mono text-[11px] transition-colors ${
-                aspect === a
-                  ? "bg-foreground text-background"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {a}
-            </button>
-          ))}
-        </div>
+      <div className="flex items-center justify-between px-6 pt-5">
+        <div className="text-[12px] font-medium text-foreground/70">Nexva.ai · Image</div>
+        <button className="rounded-full border border-border bg-background px-3 py-1 text-[12px] text-foreground/80 hover:bg-accent transition-colors">
+          Upgrade
+        </button>
       </div>
 
-      <div className="mx-auto mt-12 w-full max-w-[820px] px-6 anim-fade-up">
-        <h2 className="font-serif text-[44px] leading-[1.05] text-foreground">
-          Compose with light.
-          <br />
-          <span className="text-foreground/55">Describe an image and Nexva will render it.</span>
+      <div className="mx-auto mt-20 w-full max-w-[720px] px-6 anim-fade-up">
+        <h2 className="text-center text-[36px] font-semibold leading-[1.1] tracking-tight text-foreground sm:text-[40px]">
+          Describe an image to render.
         </h2>
 
-        <div className="mt-8">
+        <div className="mt-7">
           <ChatComposer
             placeholder="A still life of ceramics on a linen tablecloth, soft window light…"
             onSubmit={generate}
           />
+        </div>
+
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+          {ASPECT_OPTIONS.map((a) => (
+            <button
+              key={a}
+              onClick={() => setAspect(a)}
+              className={cn(
+                "rounded-full border px-3 py-1 font-mono text-[11px] transition-colors",
+                aspect === a
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border bg-background text-foreground/70 hover:bg-accent",
+              )}
+            >
+              {a}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -95,12 +96,10 @@ function aspectClass(a: string) {
 function GalleryCard({ item, aspect }: { item: GenItem; aspect: string }) {
   return (
     <div className="anim-fade-up overflow-hidden rounded-2xl border border-border bg-card">
-      <div
-        className={`relative ${aspectClass(aspect)} w-full bg-gradient-to-br from-muted to-accent/40`}
-      >
+      <div className={`relative ${aspectClass(aspect)} w-full bg-muted`}>
         {item.status === "pending" ? (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex items-center gap-2 rounded-full bg-background/80 px-3 py-1.5 text-[12px] text-muted-foreground backdrop-blur">
+            <div className="flex items-center gap-2 rounded-full bg-background/90 px-3 py-1.5 text-[12px] text-muted-foreground">
               <Aperture className="h-3.5 w-3.5 animate-pulse" strokeWidth={1.5} />
               Rendering…
             </div>
@@ -127,9 +126,9 @@ function EmptyGallery() {
       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background">
         <ImageIcon className="h-5 w-5 text-muted-foreground" strokeWidth={1.5} />
       </div>
-      <div className="mt-4 font-serif text-[22px] text-foreground">No renders yet</div>
+      <div className="mt-4 text-[18px] font-semibold text-foreground">No renders yet</div>
       <div className="mx-auto mt-2 max-w-[420px] text-[13px] text-muted-foreground">
-        Your generated images will appear here in a clean grid. Start with a descriptive prompt above.
+        Your generated images will appear here in a clean grid.
       </div>
     </div>
   );

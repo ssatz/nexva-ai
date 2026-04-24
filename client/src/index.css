@@ -1,9 +1,11 @@
 /*
-  Nexva.ai — Quiet Studio
+  Nexva.ai — Minimal Black & White
   ----------------------------------------------------------
-  Design philosophy: editorial monochrome, warm off-white paper,
-  one muted lilac accent reserved for active/send states.
-  Typography pairing: Instrument Serif (display) + Inter Tight (UI).
+  Reference: Runable.com / Lovart.ai
+  Design philosophy: pure white canvas, near-black ink for text,
+  mid-gray hairline borders, single near-black "primary" used for
+  the send button and active states. No color, no gradients,
+  no shadows beyond a subtle border + soft focus ring.
 */
 
 @import "tailwindcss";
@@ -12,8 +14,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Inter Tight", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-serif: "Instrument Serif", ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --radius-sm: calc(var(--radius) - 4px);
@@ -56,80 +57,82 @@
 }
 
 :root {
-  --radius: 0.875rem; /* 14px — generous editorial radius */
+  --radius: 0.875rem; /* 14px */
 
-  /* Quiet Studio palette */
-  --background: oklch(0.985 0.004 80);          /* warm paper off-white */
-  --foreground: oklch(0.20 0.012 270);          /* near-black ink */
-  --card: oklch(1 0 0);                          /* pure white surface */
-  --card-foreground: oklch(0.20 0.012 270);
+  /* Pure monochrome */
+  --background: oklch(1 0 0);                 /* pure white */
+  --foreground: oklch(0.16 0 0);              /* near-black */
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.16 0 0);
+
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.20 0.012 270);
+  --popover-foreground: oklch(0.16 0 0);
 
-  --primary: oklch(0.62 0.14 285);               /* muted lilac */
-  --primary-foreground: oklch(0.985 0.004 80);
+  --primary: oklch(0.16 0 0);                  /* near-black */
+  --primary-foreground: oklch(1 0 0);
 
-  --secondary: oklch(0.96 0.005 80);
-  --secondary-foreground: oklch(0.30 0.01 270);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.30 0 0);
 
-  --muted: oklch(0.955 0.004 80);
-  --muted-foreground: oklch(0.50 0.012 270);
+  --muted: oklch(0.965 0 0);
+  --muted-foreground: oklch(0.52 0 0);
 
-  --accent: oklch(0.94 0.012 285);               /* lilac wash for hover bg */
-  --accent-foreground: oklch(0.30 0.05 285);
+  --accent: oklch(0.95 0 0);
+  --accent-foreground: oklch(0.16 0 0);
 
-  --destructive: oklch(0.58 0.19 27);
-  --destructive-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.55 0 0);
+  --destructive-foreground: oklch(1 0 0);
 
-  --border: oklch(0.91 0.005 80);                /* hairline */
-  --input: oklch(0.91 0.005 80);
-  --ring: oklch(0.62 0.14 285);
+  --border: oklch(0.92 0 0);                   /* hairline gray */
+  --input: oklch(0.92 0 0);
+  --ring: oklch(0.16 0 0 / 0.30);
 
-  --chart-1: oklch(0.62 0.14 285);
-  --chart-2: oklch(0.55 0.10 285);
-  --chart-3: oklch(0.45 0.08 285);
-  --chart-4: oklch(0.70 0.08 80);
-  --chart-5: oklch(0.50 0.01 270);
+  --chart-1: oklch(0.16 0 0);
+  --chart-2: oklch(0.40 0 0);
+  --chart-3: oklch(0.60 0 0);
+  --chart-4: oklch(0.78 0 0);
+  --chart-5: oklch(0.92 0 0);
 
-  /* Sidebar gets a slightly warmer / deeper tone than canvas */
-  --sidebar: oklch(0.97 0.006 80);
-  --sidebar-foreground: oklch(0.30 0.012 270);
-  --sidebar-primary: oklch(0.62 0.14 285);
-  --sidebar-primary-foreground: oklch(0.985 0.004 80);
-  --sidebar-accent: oklch(0.93 0.008 80);
-  --sidebar-accent-foreground: oklch(0.20 0.012 270);
-  --sidebar-border: oklch(0.90 0.005 80);
-  --sidebar-ring: oklch(0.62 0.14 285);
+  /* Sidebar slightly off-white for separation, but no warm tint */
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.30 0 0);
+  --sidebar-primary: oklch(0.16 0 0);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.94 0 0);
+  --sidebar-accent-foreground: oklch(0.16 0 0);
+  --sidebar-border: oklch(0.92 0 0);
+  --sidebar-ring: oklch(0.16 0 0 / 0.30);
 }
 
 .dark {
-  --background: oklch(0.16 0.008 270);
-  --foreground: oklch(0.92 0.005 80);
-  --card: oklch(0.20 0.008 270);
-  --card-foreground: oklch(0.92 0.005 80);
-  --popover: oklch(0.20 0.008 270);
-  --popover-foreground: oklch(0.92 0.005 80);
-  --primary: oklch(0.72 0.14 285);
-  --primary-foreground: oklch(0.16 0.008 270);
-  --secondary: oklch(0.22 0.008 270);
-  --secondary-foreground: oklch(0.80 0.005 80);
-  --muted: oklch(0.24 0.008 270);
-  --muted-foreground: oklch(0.65 0.012 270);
-  --accent: oklch(0.26 0.02 285);
-  --accent-foreground: oklch(0.92 0.005 80);
-  --destructive: oklch(0.70 0.19 22);
-  --destructive-foreground: oklch(0.985 0 0);
+  --background: oklch(0.14 0 0);
+  --foreground: oklch(0.96 0 0);
+  --card: oklch(0.18 0 0);
+  --card-foreground: oklch(0.96 0 0);
+  --popover: oklch(0.18 0 0);
+  --popover-foreground: oklch(0.96 0 0);
+  --primary: oklch(0.96 0 0);
+  --primary-foreground: oklch(0.14 0 0);
+  --secondary: oklch(0.22 0 0);
+  --secondary-foreground: oklch(0.85 0 0);
+  --muted: oklch(0.22 0 0);
+  --muted-foreground: oklch(0.65 0 0);
+  --accent: oklch(0.24 0 0);
+  --accent-foreground: oklch(0.96 0 0);
+  --destructive: oklch(0.70 0 0);
+  --destructive-foreground: oklch(0.14 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.72 0.14 285);
-  --sidebar: oklch(0.18 0.008 270);
-  --sidebar-foreground: oklch(0.85 0.005 80);
-  --sidebar-primary: oklch(0.72 0.14 285);
-  --sidebar-primary-foreground: oklch(0.16 0.008 270);
-  --sidebar-accent: oklch(0.24 0.012 285);
-  --sidebar-accent-foreground: oklch(0.92 0.005 80);
+  --ring: oklch(0.96 0 0 / 0.40);
+  --sidebar: oklch(0.16 0 0);
+  --sidebar-foreground: oklch(0.85 0 0);
+  --sidebar-primary: oklch(0.96 0 0);
+  --sidebar-primary-foreground: oklch(0.14 0 0);
+  --sidebar-accent: oklch(0.22 0 0);
+  --sidebar-accent-foreground: oklch(0.96 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.72 0.14 285);
+  --sidebar-ring: oklch(0.96 0 0 / 0.40);
 }
 
 @layer base {
@@ -139,14 +142,9 @@
   html, body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
-    font-feature-settings: "ss01", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-  }
-  .font-serif {
-    font-family: var(--font-serif);
-    letter-spacing: -0.01em;
   }
   .font-mono {
     font-family: var(--font-mono);
@@ -162,19 +160,6 @@
   input[type="checkbox"]:not(:disabled),
   input[type="radio"]:not(:disabled) {
     @apply cursor-pointer;
-  }
-
-  /* Subtle paper texture via radial noise */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    background-image:
-      radial-gradient(oklch(0.20 0.012 270 / 0.018) 1px, transparent 1px);
-    background-size: 3px 3px;
-    mix-blend-mode: multiply;
   }
 }
 
@@ -200,41 +185,23 @@
     .container { padding-left: 2rem; padding-right: 2rem; max-width: 1280px; }
   }
 
-  /* Pencil-stroke underline used on starter prompts */
-  .pencil-underline {
-    background-image: linear-gradient(currentColor, currentColor);
-    background-size: 0% 1px;
-    background-repeat: no-repeat;
-    background-position: 0 100%;
-    transition: background-size 350ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .pencil-underline:hover {
-    background-size: 100% 1px;
-  }
-
-  /* Soft inner ring used on focused input shelf */
+  /* Composer shell — white, hairline border, soft focus ring (no color) */
   .input-shelf {
-    box-shadow:
-      0 1px 0 0 oklch(1 0 0) inset,
-      0 0 0 1px var(--border),
-      0 24px 48px -28px oklch(0.20 0.012 270 / 0.10);
-    transition: box-shadow 220ms ease, transform 220ms ease;
+    background: var(--card);
+    border: 1px solid var(--border);
+    transition: border-color 200ms ease, box-shadow 200ms ease;
   }
   .input-shelf:focus-within {
-    box-shadow:
-      0 1px 0 0 oklch(1 0 0) inset,
-      0 0 0 1px oklch(0.62 0.14 285 / 0.45),
-      0 0 0 4px oklch(0.62 0.14 285 / 0.08),
-      0 28px 56px -28px oklch(0.62 0.14 285 / 0.18);
-    transform: translateY(-2px);
+    border-color: oklch(0.16 0 0 / 0.45);
+    box-shadow: 0 0 0 4px oklch(0.16 0 0 / 0.05);
   }
 
   /* Reusable fade-in-up entrance */
   @keyframes nexva-fade-up {
-    from { opacity: 0; transform: translateY(12px); }
+    from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
   }
   .anim-fade-up {
-    animation: nexva-fade-up 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: nexva-fade-up 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 }

@@ -1,6 +1,5 @@
 /*
-  TasksView — schedule and track recurring/one-off tasks.
-  Natural-language input via composer + a clean list of tasks below.
+  TasksView — B&W minimal, Runable-style centered hero with a tasks list.
 */
 
 import { useState } from "react";
@@ -57,11 +56,9 @@ export function TasksView() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="flex items-center justify-between px-8 pt-6">
-        <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-          Workspace · Tasks
-        </div>
-        <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-[11px] text-muted-foreground">
+      <div className="flex items-center justify-between px-6 pt-5">
+        <div className="text-[12px] font-medium text-foreground/70">Nexva.ai · Tasks</div>
+        <div className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 text-[11px] text-muted-foreground">
           <ListChecks className="h-3 w-3" strokeWidth={1.5} />
           <span className="font-mono">
             {tasks.filter((t) => t.status === "scheduled").length} scheduled
@@ -69,39 +66,39 @@ export function TasksView() {
         </div>
       </div>
 
-      <div className="mx-auto mt-12 w-full max-w-[820px] px-6 anim-fade-up">
-        <h2 className="font-serif text-[44px] leading-[1.05] text-foreground">
-          On a quiet schedule.
-          <br />
-          <span className="text-foreground/55">Describe a task in plain language.</span>
+      <div className="mx-auto mt-20 w-full max-w-[720px] px-6 anim-fade-up">
+        <h2 className="text-center text-[36px] font-semibold leading-[1.1] tracking-tight text-foreground sm:text-[40px]">
+          Schedule a task in plain language.
         </h2>
-        <div className="mt-8">
+        <div className="mt-7">
           <ChatComposer
-            placeholder="‘Email me a summary of new AI papers every Monday at 8am’"
+            placeholder="Email me a summary of new AI papers every Monday at 8am"
             onSubmit={add}
           />
         </div>
       </div>
 
-      <div className="mx-auto mt-12 w-full max-w-[820px] flex-1 px-6 pb-16">
-        <div className="mb-4 flex items-baseline justify-between">
-          <div className="font-serif text-[20px] text-foreground">Your tasks</div>
+      <div className="mx-auto mt-12 w-full max-w-[760px] flex-1 px-6 pb-16">
+        <div className="mb-3 flex items-baseline justify-between border-b border-border pb-3">
+          <div className="text-[13px] font-medium text-foreground">Your tasks</div>
           <div className="font-mono text-[11px] text-muted-foreground">
             {tasks.length} total
           </div>
         </div>
 
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col">
           {tasks.map((t) => (
             <li
               key={t.id}
               className={cn(
-                "anim-fade-up flex items-start gap-4 rounded-xl border border-border bg-card px-5 py-4 transition-opacity",
+                "anim-fade-up flex items-start gap-4 border-b border-border px-1 py-4 transition-opacity",
                 t.status !== "scheduled" && "opacity-50",
               )}
             >
               <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-background">
-                {t.cadence.toLowerCase().includes("recurring") || t.cadence.toLowerCase().includes("weekly") || t.cadence.toLowerCase().includes("daily") ? (
+                {t.cadence.toLowerCase().includes("recurring") ||
+                t.cadence.toLowerCase().includes("weekly") ||
+                t.cadence.toLowerCase().includes("daily") ? (
                   <Repeat className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} />
                 ) : (
                   <Calendar className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.5} />
@@ -122,15 +119,8 @@ export function TasksView() {
                   <span className="text-border">·</span>
                   <span>Next: {t.nextRun}</span>
                   <span className="text-border">·</span>
-                  <span
-                    className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5",
-                      t.status === "scheduled" && "bg-accent text-accent-foreground",
-                      t.status === "done" && "bg-muted text-muted-foreground",
-                      t.status === "cancelled" && "bg-muted text-muted-foreground",
-                    )}
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-2 py-0.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-foreground" />
                     {t.status}
                   </span>
                 </div>

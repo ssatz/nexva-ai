@@ -1,7 +1,6 @@
 /*
   Home — Nexva.ai workspace shell.
-  Quiet Studio: warm off-white canvas, hairline divider, lower-third composer.
-  Single-page client routing across {chat | image | search | tasks} via AppShell.
+  B&W minimal · slim icon rail · centered chat-first hero.
 */
 
 import { useState } from "react";
@@ -14,22 +13,31 @@ import { toast } from "sonner";
 
 export default function Home() {
   const [active, setActive] = useState<NavKey>("chat");
-  // Bump key to force-remount the active view → resets local message/task state
   const [resetTick, setResetTick] = useState(0);
 
   function newSession() {
     setResetTick((n) => n + 1);
     toast("New session", {
-      description: "Started a clean slate in the current workspace.",
+      description: "Started a clean slate.",
     });
+  }
+
+  function handleChip(key: string) {
+    if (key === "more") {
+      toast("More tools coming soon");
+      return;
+    }
+    if (key === "chat" || key === "image" || key === "search" || key === "tasks") {
+      setActive(key);
+    }
   }
 
   return (
     <AppShell active={active} onNavigate={setActive} onNewSession={newSession}>
-      {active === "chat"   && <ChatView   key={`chat-${resetTick}`} />}
-      {active === "image"  && <ImageGenView key={`image-${resetTick}`} />}
-      {active === "search" && <SearchView   key={`search-${resetTick}`} />}
-      {active === "tasks"  && <TasksView    key={`tasks-${resetTick}`} />}
+      {active === "chat"   && <ChatView      key={`chat-${resetTick}`}   onChip={handleChip} />}
+      {active === "image"  && <ImageGenView  key={`image-${resetTick}`} />}
+      {active === "search" && <SearchView    key={`search-${resetTick}`} />}
+      {active === "tasks"  && <TasksView     key={`tasks-${resetTick}`} />}
     </AppShell>
   );
 }

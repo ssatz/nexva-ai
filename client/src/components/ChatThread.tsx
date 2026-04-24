@@ -1,7 +1,5 @@
 /*
-  ChatThread — clean, readable conversation rendering.
-  User: small uppercase label, soft surface, foreground text.
-  Assistant: serif-touched label, plain canvas, markdown body.
+  ChatThread — B&W minimal conversation rendering.
 */
 
 import { Streamdown } from "streamdown";
@@ -18,13 +16,13 @@ export interface ChatMessage {
 
 export function ChatThread({ messages }: { messages: ChatMessage[] }) {
   return (
-    <div className="mx-auto flex w-full max-w-[760px] flex-col gap-8 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-[720px] flex-col gap-7 px-4 py-10">
       {messages.map((m) => (
         <div key={m.id} className="anim-fade-up">
           <div
             className={cn(
-              "mb-2 text-[11px] uppercase tracking-[0.16em]",
-              m.role === "user" ? "text-muted-foreground" : "text-primary/80",
+              "mb-2 text-[11px] font-medium uppercase tracking-wider",
+              m.role === "user" ? "text-muted-foreground" : "text-foreground/80",
             )}
           >
             {m.role === "user" ? "You" : "Nexva"}
