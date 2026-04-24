@@ -33,10 +33,15 @@ const SEED_TASKS: Task[] = [
   },
 ];
 
-export function TasksView() {
+interface TasksViewProps {
+  onSubmitPrompt?: (value: string) => void;
+}
+
+export function TasksView({ onSubmitPrompt }: TasksViewProps = {}) {
   const [tasks, setTasks] = useState<Task[]>(SEED_TASKS);
 
   function add(title: string) {
+    onSubmitPrompt?.(title);
     const t: Task = {
       id: crypto.randomUUID(),
       title,

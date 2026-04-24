@@ -17,11 +17,16 @@ interface GenItem {
 
 const ASPECT_OPTIONS = ["1:1", "3:2", "16:9", "9:16"] as const;
 
-export function ImageGenView() {
+interface ImageGenViewProps {
+  onSubmitPrompt?: (value: string) => void;
+}
+
+export function ImageGenView({ onSubmitPrompt }: ImageGenViewProps = {}) {
   const [items, setItems] = useState<GenItem[]>([]);
   const [aspect, setAspect] = useState<(typeof ASPECT_OPTIONS)[number]>("1:1");
 
   function generate(prompt: string) {
+    onSubmitPrompt?.(prompt);
     const id = crypto.randomUUID();
     setItems((arr) => [{ id, prompt, status: "pending" }, ...arr]);
     toast("Render queued", { description: prompt });

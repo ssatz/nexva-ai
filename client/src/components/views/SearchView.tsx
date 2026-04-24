@@ -38,10 +38,15 @@ const MOCK_RESULTS: SearchResult[] = [
   },
 ];
 
-export function SearchView() {
+interface SearchViewProps {
+  onSubmitPrompt?: (value: string) => void;
+}
+
+export function SearchView({ onSubmitPrompt }: SearchViewProps = {}) {
   const [query, setQuery] = useState<string | null>(null);
 
   function search(q: string) {
+    onSubmitPrompt?.(q);
     setQuery(q);
     toast("Searching the web", { description: q });
   }

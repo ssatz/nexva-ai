@@ -1,25 +1,28 @@
 /*
   Home — Nexva.ai workspace shell.
-  B&W minimal · slim icon rail · centered chat-first hero.
+  Wraps everything in HistoryProvider (sidebar consumes it) and renders the
+  persistent TopBar (credits pill + account dropdown) on every view.
 */
 
 import { useState } from "react";
 import { AppShell, type NavKey } from "@/components/AppShell";
+import { TopBar } from "@/components/TopBar";
+import { HistoryProvider, useHistory } from "@/contexts/HistoryContext";
 import { ChatView } from "@/components/views/ChatView";
 import { ImageGenView } from "@/components/views/ImageGenView";
 import { SearchView } from "@/components/views/SearchView";
 import { TasksView } from "@/components/views/TasksView";
 import { toast } from "sonner";
 
-export default function Home() {
+function HomeInner() {
   const [active, setActive] = useState<NavKey>("chat");
   const [resetTick, setResetTick] = useState(0);
+  const { addEntry } = useHistory();
 
   function newSession() {
     setResetTick((n) => n + 1);
-    toast("New session", {
-      description: "Started a clean slate.",
-    });
+    setActive("chat");
+    toast("New session", { description: "Started a clean slate." });
   }
 
   function handleChip(key: string) {
@@ -32,12 +35,30 @@ export default function Home() {
     }
   }
 
+  // Image / Search / Tasks views also push history entries on submit.
+  function logToHistory(prefix: string, value: string) {
+    addEntry(`${prefix}: ${value}`);
+  }
+
   return (
-    <AppShell active={active} onNavigate={setActive} onNewSession={newSession}>
+    <AppShell
+      active={active}
+      onNavigate={setActive}
+      onNewSession={newSession}
+      topBar={<TopBar />}
+    >
       {active === "chat"   && <ChatView      key={`chat-${resetTick}`}   onChip={handleChip} />}
-      {active === "image"  && <ImageGenView  key={`image-${resetTick}`} />}
-      {active === "search" && <SearchView    key={`search-${resetTick}`} />}
-      {active === "tasks"  && <TasksView     key={`tasks-${resetTick}`} />}
+      {active === "image"  && <ImageGenView  key={`image-${resetTick}`}  onSubmitPrompt={(v) => logToHistory("Image", v)} />}
+      {active === "search" && <SearchView    key={`search-${resetTick}`} onSubmitPrompt={(v) => logToHistory("Search", v)} />}
+      {active === "tasks"  && <TasksView     key={`tasks-${resetTick}`}  onSubmitPrompt={(v) => logToHistory("Task", v)} />}
     </AppShell>
+  );
+}
+
+export default function Home() {
+  return (
+    <HistoryProvider>
+      <HomeInner />
+    </HistoryProvider>
   );
 }

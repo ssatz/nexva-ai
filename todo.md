@@ -1,9 +1,10 @@
-# Nexva.ai — B&W Minimal Redesign (Runable-style)
+# Nexva.ai — Sidebar + Account + Tools Iteration
 
-- [x] Re-theme `client/src/index.css` to a strict black & white palette.
-- [x] Switch to Inter and drop the serif greeting.
-- [ ] Rebuild `AppShell` into a slim icon-only rail (~56px), no expand/collapse, no labels visible, only tooltips on hover. Brand mark at top, nav icons grouped, user avatar at bottom.
-- [ ] Restructure `ChatView` empty state to mirror Runable: centered headline ("What needs to be done?"), centered rounded composer with leading "+" tool button and trailing send arrow, feature chip row beneath ("Chat", "Image Gen", "Search", "Tasks", "More").
-- [ ] Update `ChatComposer` styling to white surface with hairline gray border and subtle focus ring (no lilac).
-- [ ] Apply same minimal monochrome treatment to `ImageGenView`, `SearchView`, `TasksView` headers and accents.
+- [ ] Replace slim 56px rail with 240px ElevenLabs-style expanded sidebar (icon + label rows).
+- [ ] Top group: brand mark + "New chat" CTA, then primary nav (Chat, Image Gen, Search, Tasks).
+- [ ] Divider, then "History" section header with seeded mock chat entries and a "See all" link.
+- [ ] Footer of sidebar: small help/settings icons (no full account here — moved to top-right).
+- [ ] Add TopBar with right-aligned `⚡30 Upgrade` pill + circular avatar that opens a Lovart-style account dropdown (no "Create a Team": Manage Account, User Guide, Contact Us, English, OpenClaw, Log Out).
+- [ ] Add "Connect your tools to Nexva" strip docked to the bottom of the composer with 6 brand icons (Gmail, Google Calendar, Slack, Notion, GitHub, Figma) — clicking any toasts "Coming soon".
+- [ ] Wire mock history: a shared store/context so submitting a chat creates an entry, and the History list updates live.
 - [ ] Save checkpoint and deliver.
