@@ -1,11 +1,18 @@
 /*
-  HistoryContext — tiny store for sidebar History.
+  HistoryContext — sidebar History store.
   - Seeded with mock entries.
   - addEntry(title) pushes a new item to the top.
-  - Pure in-memory (no persistence) per the brief.
+  - activeId / setActiveId let any view (Chat) react when a history row is clicked.
 */
 
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 export interface HistoryEntry {
   id: string;
@@ -16,12 +23,14 @@ export interface HistoryEntry {
 
 interface HistoryContextValue {
   entries: HistoryEntry[];
-  addEntry: (title: string) => void;
+  addEntry: (title: string) => string; // returns the new entry's id
   clear: () => void;
+  activeId: string | null;
+  setActiveId: (id: string | null) => void;
 }
 
 const SEED: HistoryEntry[] = [
-  { id: "h1", title: "Grok Video Prompt Methods Compared",  createdAt: new Date(Date.now() - 1000 * 60 * 22).toISOString()  },
+  { id: "h1", title: "Grok Video Prompt Methods Compared",  createdAt: new Date(Date.now() - 1000 * 60 * 22).toISOString() },
   { id: "h2", title: "Faceless Story Narration: Best Voices", createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString() },
   { id: "h3", title: "AI Chat Credit Debit Strategy",          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString() },
   { id: "h4", title: "Nexva Hero Section Prompt",              createdAt: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString() },
@@ -34,22 +43,25 @@ const HistoryContext = createContext<HistoryContextValue | null>(null);
 
 export function HistoryProvider({ children }: { children: ReactNode }) {
   const [entries, setEntries] = useState<HistoryEntry[]>(SEED);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const addEntry = useCallback((title: string) => {
     const trimmed = title.trim().replace(/\s+/g, " ");
-    if (!trimmed) return;
+    const id = crypto.randomUUID();
+    if (!trimmed) return id;
     const display = trimmed.length > 56 ? trimmed.slice(0, 56) + "…" : trimmed;
     setEntries((prev) => [
-      { id: crypto.randomUUID(), title: display, createdAt: new Date().toISOString() },
+      { id, title: display, createdAt: new Date().toISOString() },
       ...prev,
     ]);
+    return id;
   }, []);
 
   const clear = useCallback(() => setEntries([]), []);
 
   const value = useMemo<HistoryContextValue>(
-    () => ({ entries, addEntry, clear }),
-    [entries, addEntry, clear],
+    () => ({ entries, addEntry, clear, activeId, setActiveId }),
+    [entries, addEntry, clear, activeId],
   );
 
   return <HistoryContext.Provider value={value}>{children}</HistoryContext.Provider>;

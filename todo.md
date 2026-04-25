@@ -1,9 +1,8 @@
-# Nexva.ai — ChatPDF iteration
+# Nexva.ai — History Mock-up: "Grok Video Prompt Methods Compared"
 
-- [ ] Add a "ChatPDF" chip to the home page chip row (between Tasks and More); reuse the existing chip click handler to switch view.
-- [ ] Add a `pdf` view key (no sidebar entry).
-- [ ] Build `ChatPdfView` empty state: centered "Document Intelligence" headline, dashed monochrome upload zone (icon + Click to upload or drag-and-drop + format hint + Select File button), Recent Documents list below.
-- [ ] Build `ChatPdfView` active state: 2-column layout inside the canvas — left = PDF list (search input, items list, "+ Select File"), right = chat thread with model row (mock GPT-4o-mini) + file pill at top + composer "Ask something about your PDF…" at bottom.
-- [ ] Switching screens: clicking a file or uploading enters active state; back arrow returns to empty state.
-- [ ] Drag-and-drop accepts a file (visual only); show toast "Uploaded — preview only".
+- [ ] Create `client/src/data/mockSessions.ts` with a typed `MOCK_SESSIONS` map keyed by history id, and seed the `h1` "Grok Video Prompt Methods Compared" entry with a designed multi-turn conversation (intro question, comparison table, code-style example prompts, follow-up).
+- [ ] Refactor `HistoryContext` to also expose `activeId` + `setActiveId`, and to mark the `h1` seed entry as a "mock" so clicking it loads canned messages.
+- [ ] Update `ChatView` to read `activeId` and hydrate `messages` from `MOCK_SESSIONS` when present; switching back to a blank session clears the thread.
+- [ ] Add a slim session header above the thread showing the title and a small "Mock preview" tag.
+- [ ] Tighten Streamdown table + code styling so the comparison table looks clean in B&W.
 - [ ] Save checkpoint and deliver.

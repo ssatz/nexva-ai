@@ -41,7 +41,7 @@ interface AppShellProps {
 }
 
 export function AppShell({ active, onNavigate, onNewSession, topBar, children }: AppShellProps) {
-  const { entries } = useHistory();
+  const { entries, activeId, setActiveId } = useHistory();
   const [historyOpen, setHistoryOpen] = useState(true);
   const VISIBLE = 7;
   const visible = entries.slice(0, VISIBLE);
@@ -120,8 +120,16 @@ export function AppShell({ active, onNavigate, onNewSession, topBar, children }:
                   {visible.map((h) => (
                     <li key={h.id}>
                       <button
-                        onClick={() => toast(h.title, { description: "Opening session…" })}
-                        className="block w-full truncate rounded-md px-2.5 py-1.5 text-left text-[13px] text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
+                        onClick={() => {
+                          setActiveId(h.id);
+                          onNavigate("chat");
+                        }}
+                        className={cn(
+                          "block w-full truncate rounded-md px-2.5 py-1.5 text-left text-[13px] transition-colors hover:bg-accent hover:text-foreground",
+                          h.id === activeId
+                            ? "bg-accent font-medium text-foreground"
+                            : "text-foreground/80",
+                        )}
                         title={h.title}
                       >
                         {h.title}
