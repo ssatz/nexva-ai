@@ -16,6 +16,7 @@ import {
   Search,
   ListChecks,
   MoreHorizontal,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -25,6 +26,7 @@ const CHIPS = [
   { key: "image",  label: "Image Gen", icon: ImagePlus },
   { key: "search", label: "Search",    icon: Search },
   { key: "tasks",  label: "Tasks",     icon: ListChecks },
+  { key: "pdf",    label: "ChatPDF",   icon: FileText },
   { key: "more",   label: "More",      icon: MoreHorizontal },
 ];
 

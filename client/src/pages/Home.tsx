@@ -12,10 +12,13 @@ import { ChatView } from "@/components/views/ChatView";
 import { ImageGenView } from "@/components/views/ImageGenView";
 import { SearchView } from "@/components/views/SearchView";
 import { TasksView } from "@/components/views/TasksView";
+import { ChatPdfView } from "@/components/views/ChatPdfView";
 import { toast } from "sonner";
 
+type ViewKey = NavKey | "pdf";
+
 function HomeInner() {
-  const [active, setActive] = useState<NavKey>("chat");
+  const [active, setActive] = useState<ViewKey>("chat");
   const [resetTick, setResetTick] = useState(0);
   const { addEntry } = useHistory();
 
@@ -30,7 +33,13 @@ function HomeInner() {
       toast("More tools coming soon");
       return;
     }
-    if (key === "chat" || key === "image" || key === "search" || key === "tasks") {
+    if (
+      key === "chat" ||
+      key === "image" ||
+      key === "search" ||
+      key === "tasks" ||
+      key === "pdf"
+    ) {
       setActive(key);
     }
   }
@@ -42,8 +51,8 @@ function HomeInner() {
 
   return (
     <AppShell
-      active={active}
-      onNavigate={setActive}
+      active={active === "pdf" ? "chat" : active}
+      onNavigate={(k) => setActive(k)}
       onNewSession={newSession}
       topBar={<TopBar />}
     >
@@ -51,6 +60,7 @@ function HomeInner() {
       {active === "image"  && <ImageGenView  key={`image-${resetTick}`}  onSubmitPrompt={(v) => logToHistory("Image", v)} />}
       {active === "search" && <SearchView    key={`search-${resetTick}`} onSubmitPrompt={(v) => logToHistory("Search", v)} />}
       {active === "tasks"  && <TasksView     key={`tasks-${resetTick}`}  onSubmitPrompt={(v) => logToHistory("Task", v)} />}
+      {active === "pdf"    && <ChatPdfView   key={`pdf-${resetTick}`} />}
     </AppShell>
   );
 }
