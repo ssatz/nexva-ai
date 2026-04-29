@@ -1,10 +1,11 @@
 /*
   Home — Nexva.ai workspace shell.
-  Wraps everything in HistoryProvider (sidebar consumes it) and renders the
-  persistent TopBar (credits pill + account dropdown) on every view.
+  Tracks `sessionTitle` so ChatView can bubble up the currently-open seeded
+  conversation; when present, TopBar flips into session mode (centered title +
+  Share + Kebab to the left of the Upgrade pill).
 */
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { AppShell, type NavKey } from "@/components/AppShell";
 import { TopBar } from "@/components/TopBar";
 import { HistoryProvider, useHistory } from "@/contexts/HistoryContext";
@@ -21,11 +22,13 @@ type ViewKey = NavKey | "pdf";
 function HomeInner() {
   const [active, setActive] = useState<ViewKey>("chat");
   const [resetTick, setResetTick] = useState(0);
+  const [sessionTitle, setSessionTitle] = useState<string | null>(null);
   const { addEntry } = useHistory();
 
   function newSession() {
     setResetTick((n) => n + 1);
     setActive("chat");
+    setSessionTitle(null);
     toast("New session", { description: "Started a clean slate." });
   }
 
@@ -46,19 +49,31 @@ function HomeInner() {
     }
   }
 
-  // Image / Search / Tasks views also push history entries on submit.
   function logToHistory(prefix: string, value: string) {
     addEntry(`${prefix}: ${value}`);
   }
+
+  // Stable callback so ChatView's effect doesn't thrash.
+  const onSessionTitleChange = useCallback((t: string | null) => {
+    setSessionTitle(t);
+  }, []);
 
   return (
     <AppShell
       active={active === "pdf" ? "chat" : active}
       onNavigate={(k) => setActive(k)}
       onNewSession={newSession}
-      topBar={<TopBar />}
+      topBar={
+        <TopBar
+          title={active === "chat" ? sessionTitle ?? undefined : undefined}
+          onShare={() => toast("Link copied", { description: "Anyone with the link can view." })}
+          onRename={() => toast("Rename", { description: "Coming soon" })}
+          onExport={() => toast("Export", { description: "Coming soon" })}
+          onDelete={() => toast("Delete", { description: "Coming soon" })}
+        />
+      }
     >
-      {active === "chat"   && <ChatView      key={`chat-${resetTick}`}   onChip={handleChip} />}
+      {active === "chat"   && <ChatView      key={`chat-${resetTick}`}   onChip={handleChip} onSessionTitleChange={onSessionTitleChange} />}
       {active === "studio" && <StudioView    key={`studio-${resetTick}`} />}
       {active === "image"  && <ImageGenView  key={`image-${resetTick}`}  onSubmitPrompt={(v) => logToHistory("Image", v)} />}
       {active === "search" && <SearchView    key={`search-${resetTick}`} onSubmitPrompt={(v) => logToHistory("Search", v)} />}

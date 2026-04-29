@@ -1,11 +1,12 @@
 /*
-  ChatView — B&W minimal, Runable-inspired layout.
+  ChatView — B&W minimal.
   - Empty state: centered headline + composer + ToolsStrip + chip row.
-  - Active state: scrolling thread with sticky composer + ToolsStrip.
-  - Submitting a prompt also appends an entry to the sidebar History.
-  - Clicking a History row sets `activeId` in HistoryContext; if that id
-    has a canned conversation in MOCK_SESSIONS, hydrate the thread with it
-    and show a slim session header above.
+  - Brand-new session (user-driven): same as before — sticky composer above the thread.
+  - Seeded history session (Gemini-reference layout):
+      * TopBar shows the session title (set via onSessionTitleChange prop).
+      * Thread is the ONLY scrollable region.
+      * Composer is anchored in a non-scrolling footer at the bottom of the canvas.
+      * Placeholder switches to "Ask Nexva".
 */
 
 import { useEffect, useState } from "react";
@@ -21,8 +22,6 @@ import {
   ListChecks,
   MoreHorizontal,
   FileText,
-  Sparkles,
-  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -38,27 +37,30 @@ const CHIPS = [
 
 interface ChatViewProps {
   onChip?: (key: string) => void;
+  /** Parent (Home) uses this to render the session title in TopBar. */
+  onSessionTitleChange?: (title: string | null) => void;
 }
 
-export function ChatView({ onChip }: ChatViewProps) {
+export function ChatView({ onChip, onSessionTitleChange }: ChatViewProps) {
   const { addEntry, activeId, setActiveId } = useHistory();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  // Hydrate from a mock session when activeId is set to one of the seeded ids.
   const seeded = activeId ? MOCK_SESSIONS[activeId] : undefined;
+
   useEffect(() => {
-    if (seeded) {
-      setMessages(seeded.messages);
-    } else if (activeId) {
-      // History row without a canned conversation — show empty state with a soft hint.
-      setMessages([]);
-    }
-    // We deliberately depend on activeId, not on `seeded`, to avoid loops.
+    if (seeded) setMessages(seeded.messages);
+    else if (activeId) setMessages([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId]);
 
+  // Bubble the title up to TopBar while a seeded session is active.
+  useEffect(() => {
+    if (!onSessionTitleChange) return;
+    onSessionTitleChange(seeded ? seeded.title : null);
+    return () => onSessionTitleChange(null);
+  }, [seeded, onSessionTitleChange]);
+
   function send(text: string) {
-    // First user message in a brand-new session becomes the history title.
     if (messages.length === 0 && !activeId) addEntry(text);
     if (activeId) setActiveId(null); // user is now driving — leave the mock context
 
@@ -95,7 +97,7 @@ export function ChatView({ onChip }: ChatViewProps) {
   // ---- Empty state ----
   if (messages.length === 0) {
     return (
-      <div className="flex flex-1 items-center justify-center px-6 pb-16">
+      <div className="flex flex-1 items-center justify-center overflow-y-auto px-6 pb-16">
         <div className="w-full max-w-[720px] -mt-4">
           <h1 className="text-center text-[40px] font-semibold leading-[1.1] tracking-tight text-foreground anim-fade-up sm:text-[44px]">
             What needs to be done?
@@ -137,65 +139,62 @@ export function ChatView({ onChip }: ChatViewProps) {
     );
   }
 
-  // ---- With messages ----
-  return (
-    <div className="relative flex flex-1 flex-col">
-      {/* Session header */}
-      {seeded && (
-        <div className="sticky top-0 z-10 border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-          <div className="mx-auto flex w-full max-w-[720px] items-start justify-between gap-4 px-4 py-3">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-foreground/70">
-                  <Sparkles className="h-3 w-3" strokeWidth={1.5} />
-                  Mock preview
-                </span>
-                <span className="font-mono text-[10.5px] uppercase tracking-wider text-muted-foreground">
-                  · 6 messages
-                </span>
+  // ---- Seeded (history) session: Gemini-style fixed chrome ----
+  if (seeded) {
+    return (
+      <div className="relative flex min-h-0 flex-1 flex-col">
+        {/* Thread — the ONLY scrollable region */}
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <ChatThread messages={messages} />
+          <div className="h-[160px]" aria-hidden />
+        </div>
+
+        {/* Anchored composer (outside the scroll region) */}
+        <div className="relative shrink-0">
+          <div
+            className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-t from-background to-transparent"
+            aria-hidden
+          />
+          <div className="bg-background px-6 pb-6">
+            <div className="mx-auto w-full max-w-[760px]">
+              <ChatComposer onSubmit={send} placeholder="Ask Nexva" />
+              <div className="mt-2 text-center text-[11px] text-muted-foreground">
+                Nexva is AI and can make mistakes.
               </div>
-              <h2 className="mt-1 truncate text-[15px] font-semibold tracking-tight text-foreground">
-                {seeded.title}
-              </h2>
-              {seeded.subtitle && (
-                <p className="mt-0.5 line-clamp-1 text-[12.5px] text-muted-foreground">
-                  {seeded.subtitle}
-                </p>
-              )}
             </div>
-            <button
-              onClick={clearSession}
-              aria-label="Close session"
-              className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-background text-foreground/70 transition-colors hover:bg-accent hover:text-foreground"
-            >
-              <X className="h-3.5 w-3.5" strokeWidth={1.75} />
-            </button>
           </div>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {!seeded && (
-        <div className="flex justify-end px-6 pt-1">
-          <button
-            onClick={clearSession}
-            className="rounded-full border border-border bg-background px-3 py-1 text-[12px] text-foreground/70 hover:text-foreground transition-colors"
-          >
-            Clear
-          </button>
-        </div>
-      )}
-
-      <div className="flex-1 overflow-y-auto pb-[200px]">
-        <ChatThread messages={messages} />
+  // ---- User-driven session (sticky composer, page-level scroll inside canvas) ----
+  return (
+    <div className="relative flex min-h-0 flex-1 flex-col">
+      <div className="flex justify-end px-6 pt-2">
+        <button
+          onClick={clearSession}
+          className="rounded-full border border-border bg-background px-3 py-1 text-[12px] text-foreground/70 hover:text-foreground transition-colors"
+        >
+          Clear
+        </button>
       </div>
 
-      <div className="pointer-events-none sticky bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/95 to-transparent pt-10 pb-6">
-        <div className="pointer-events-auto mx-auto w-full max-w-[720px] px-6">
-          <ChatComposer
-            onSubmit={send}
-            placeholder={seeded ? "Continue this conversation…" : undefined}
-          />
-          <ToolsStrip />
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <ChatThread messages={messages} />
+        <div className="h-[160px]" aria-hidden />
+      </div>
+
+      <div className="relative shrink-0">
+        <div
+          className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-t from-background to-transparent"
+          aria-hidden
+        />
+        <div className="bg-background px-6 pb-6">
+          <div className="mx-auto w-full max-w-[760px]">
+            <ChatComposer onSubmit={send} />
+            <ToolsStrip />
+          </div>
         </div>
       </div>
     </div>

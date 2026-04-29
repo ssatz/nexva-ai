@@ -1,10 +1,26 @@
 /*
-  TopBar — credits/upgrade pill + circular account avatar with Lovart-style dropdown.
-  - Pill: "⚡ 30  Upgrade" — left segment shows credits, right segment is the CTA.
-  - Avatar: opens DropdownMenu (no "Create a Team" per brief).
+  TopBar — credits pill + account dropdown on the right.
+  Session mode adds:
+    - a centered title (absolutely centered in the row, truncates on small screens)
+    - a Share button + a Kebab menu to the left of the Upgrade pill.
+  The parent (AppShell) is responsible for making the top-bar row sticky.
 */
 
-import { Zap, ChevronRight, User, BookOpen, MessageCircle, Globe, Sparkles, LogOut } from "lucide-react";
+import {
+  Zap,
+  ChevronRight,
+  User,
+  BookOpen,
+  MessageCircle,
+  Globe,
+  Sparkles,
+  LogOut,
+  Share2,
+  MoreHorizontal,
+  Pencil,
+  Download,
+  Trash2,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,11 +29,82 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
-export function TopBar() {
+interface TopBarProps {
+  /** Centered title — when provided, the top bar is in "session mode". */
+  title?: string;
+  onShare?: () => void;
+  onRename?: () => void;
+  onExport?: () => void;
+  onDelete?: () => void;
+}
+
+export function TopBar({ title, onShare, onRename, onExport, onDelete }: TopBarProps) {
+  const inSession = !!title;
+
   return (
-    <div className="flex items-center gap-2">
+    <div className="relative flex h-11 items-center gap-2">
+      {/* Centered title (session mode) */}
+      {inSession && (
+        <div className="pointer-events-none absolute left-1/2 top-1/2 w-[min(60%,520px)] -translate-x-1/2 -translate-y-1/2 text-center">
+          <span className="truncate text-[14px] font-medium tracking-tight text-foreground/90">
+            {title}
+          </span>
+        </div>
+      )}
+
+      {/* Spacer pushes the right cluster to the end */}
+      <div className="flex-1" />
+
+      {/* Share + Kebab (session mode only) */}
+      {inSession && (
+        <div className="mr-1 flex items-center gap-0.5">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => (onShare ? onShare() : toast("Share", { description: "Link copy coming soon" }))}
+                aria-label="Share"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <Share2 className="h-[15px] w-[15px]" strokeWidth={1.5} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-xs">Share</TooltipContent>
+          </Tooltip>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                aria-label="More"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <MoreHorizontal className="h-[16px] w-[16px]" strokeWidth={1.75} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={8} className="w-[200px] rounded-xl p-1">
+              <DropdownMenuItem onClick={() => (onRename ? onRename() : toast("Rename", { description: "Coming soon" }))}>
+                <Pencil className="mr-2 h-3.5 w-3.5" strokeWidth={1.5} />
+                <span className="text-[13px]">Rename</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => (onExport ? onExport() : toast("Export", { description: "Coming soon" }))}>
+                <Download className="mr-2 h-3.5 w-3.5" strokeWidth={1.5} />
+                <span className="text-[13px]">Export</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="my-1" />
+              <DropdownMenuItem
+                onClick={() => (onDelete ? onDelete() : toast("Delete", { description: "Coming soon" }))}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 h-3.5 w-3.5" strokeWidth={1.5} />
+                <span className="text-[13px]">Delete</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
+
       {/* Credits + Upgrade pill */}
       <button
         onClick={() => toast("Upgrade", { description: "Pricing coming soon" })}
@@ -60,7 +147,6 @@ export function TopBar() {
             </div>
           </DropdownMenuLabel>
 
-          {/* Plan row */}
           <button
             onClick={() => toast("Free plan", { description: "30 credits available" })}
             className="mx-1 my-1 flex w-[calc(100%-0.5rem)] items-center justify-between rounded-md px-2 py-1.5 text-[12px] text-foreground/80 hover:bg-accent transition-colors"

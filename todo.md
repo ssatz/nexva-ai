@@ -1,35 +1,26 @@
-# Nexva.ai — Studio page + collapsible sidebar
+# Nexva.ai — Session page: fixed chrome, scrollable thread
 
-## Phase 1 — Collapsible sidebar
-- [ ] Add `collapsed` boolean state in `AppShell.tsx` (default `false`, persist to `localStorage`).
-- [ ] Swap the left column width between `w-[240px]` and `w-[56px]` with a 180ms ease transition.
-- [ ] Header row:
-  - Expanded: show Nexva monogram + wordmark + PanelLeft toggle button on the right.
-  - Collapsed: show monogram only + PanelLeft toggle button (tooltip "Expand sidebar").
-- [ ] Collapsed state hides labels: icons only for primary nav; History section hidden; Help/Settings footer collapses to icon-only with tooltips.
-- [ ] Primary nav rows become 40px square buttons with centered icon (no label) when collapsed.
-- [ ] "New chat" row becomes a 40px `+` button when collapsed.
-- [ ] Every icon-only element gets a Radix tooltip on hover (right side).
+## Phase 1 — AppShell sticky
+- [ ] Make the aside sticky: `sticky top-0 h-screen` so sidebar scroll is independent.
+- [ ] Ensure `<main>` is a `flex flex-col h-screen min-h-0` so inner thread can own the scroll.
+- [ ] Page body doesn't scroll — only the thread region.
 
-## Phase 2 — Studio entry + route
-- [ ] Add `studio` to the `NavKey` union / nav items array in `AppShell.tsx`. Icon: `Sparkles` (outline).
-- [ ] Add `studio` to the view switch in `pages/Home.tsx`.
-- [ ] Keep all other routes identical.
+## Phase 2 — TopBar session mode
+- [ ] Add optional `title?`, `onShare?`, `onKebab?` props to `TopBar` (or lift title rendering to Home).
+- [ ] Render centered title absolutely centered in the top-bar row.
+- [ ] Add Share (lucide `Share2`) and Kebab (`MoreHorizontal`) icon buttons to the left of the Upgrade pill.
+- [ ] Keep TopBar fixed by pinning its parent row at the top of `<main>` with `sticky top-0 bg-background z-20 border-b border-border`.
 
-## Phase 3 — StudioView
-- [ ] Create `client/src/components/views/StudioView.tsx`.
-- [ ] Composer:
-  - Placeholder exactly: *"Try tasks, workflows, or rescheduling tasks — type @ to add files or skills"*
-  - Left bottom row: `+`, `Tools` (text button, Sliders icon), `Skill` (text button, Zap icon).
-  - Right bottom row: `Auto Model ▾`, circular send arrow.
-- [ ] Category tiles row (9 items): General, Images, Documents, Slides, Chat, Sheets, Websites, Videos, Tools.
-  - All B&W outline icons (Lucide) inside a 48px square with hairline border and 14px radius.
-  - Label below tile (13px, foreground/80).
-  - Selected state: label gets an underline offset 4px; others untouched.
-  - Default selected = "General".
-  - Click a tile → sets selected only (no pill, no route change).
-- [ ] Submitting the composer appends a history entry + toasts "Routing to {selected category}…".
+## Phase 3 — ChatView session layout
+- [ ] When `seeded` (history-hydrated) session: switch ChatView to the new frame.
+- [ ] Remove the old in-thread session header (title now in top bar).
+- [ ] Thread: `flex-1 overflow-y-auto` — the only scroll.
+- [ ] Composer: anchored in a non-scrolling footer at the bottom of `<main>`.
+- [ ] Placeholder in session mode: "Ask Nexva".
+- [ ] Keep the gradient fade above the composer for a clean reading surface.
+- [ ] Wire TopBar title from the active seeded session.
 
 ## Phase 4 — Verify + checkpoint
-- [ ] TypeScript clean, preview renders.
+- [ ] TypeScript clean.
+- [ ] Visual check: clicking "Grok Video Prompt Methods Compared" shows fixed chrome and only the thread scrolls.
 - [ ] Save checkpoint.

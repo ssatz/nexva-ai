@@ -71,11 +71,11 @@ export function AppShell({ active, onNavigate, onNewSession, topBar, children }:
   const visible = entries.slice(0, VISIBLE);
 
   return (
-    <div className="relative z-10 flex min-h-screen w-full bg-background">
-      {/* Sidebar */}
+    <div className="relative z-10 flex h-screen w-full overflow-hidden bg-background">
+      {/* Sidebar — fixed to the viewport, scrolls independently */}
       <aside
         className={cn(
-          "flex shrink-0 flex-col border-r border-border bg-sidebar",
+          "sticky top-0 flex h-screen shrink-0 flex-col border-r border-border bg-sidebar",
           "transition-[width] duration-200 ease-out",
           collapsed ? "w-[56px]" : "w-[240px]",
         )}
@@ -277,15 +277,15 @@ export function AppShell({ active, onNavigate, onNewSession, topBar, children }:
         </div>
       </aside>
 
-      {/* Canvas */}
-      <main className="relative flex flex-1 flex-col">
+      {/* Canvas — fixed height; inner view decides what scrolls */}
+      <main className="relative flex h-screen min-h-0 flex-1 flex-col">
         {topBar && (
-          <div className="flex items-center justify-between px-6 pt-4">
+          <div className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-background/85 px-6 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/70">
             <div className="text-[12px] font-medium text-foreground/60" />
             {topBar}
           </div>
         )}
-        <div className="flex flex-1 flex-col">{children}</div>
+        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
       </main>
     </div>
   );
