@@ -280,8 +280,7 @@ export function AppShell({ active, onNavigate, onNewSession, topBar, children }:
       {/* Canvas — fixed height; inner view decides what scrolls */}
       <main className="relative flex h-screen min-h-0 flex-1 flex-col">
         {topBar && (
-          <div className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-background/85 px-6 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-            <div className="text-[12px] font-medium text-foreground/60" />
+          <div className="sticky top-0 z-20 border-b border-border bg-background/85 px-6 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/70">
             {topBar}
           </div>
         )}

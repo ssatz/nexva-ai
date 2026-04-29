@@ -24,3 +24,10 @@
 - [ ] TypeScript clean.
 - [ ] Visual check: clicking "Grok Video Prompt Methods Compared" shows fixed chrome and only the thread scrolls.
 - [ ] Save checkpoint.
+
+## Phase 5 — TopBar centering fix
+- [ ] Convert the TopBar row (in AppShell) to a 3-column grid so title centers on the whole canvas.
+- [ ] In TopBar, swap absolute centering for a middle-column centered title (truncates on small widths).
+- [ ] Move Share from the session-cluster to the right of the row (before the kebab).
+- [ ] Tighten icon button sizes to match the Manus-style reference (h-9 rounded buttons, icon stroke 1.5).
+- [ ] Verify on narrow canvas the title truncates with ellipsis and doesn't collide with either cluster.
