@@ -13,6 +13,7 @@ import { ImageGenView } from "@/components/views/ImageGenView";
 import { SearchView } from "@/components/views/SearchView";
 import { TasksView } from "@/components/views/TasksView";
 import { ChatPdfView } from "@/components/views/ChatPdfView";
+import { StudioView } from "@/components/views/StudioView";
 import { toast } from "sonner";
 
 type ViewKey = NavKey | "pdf";
@@ -38,9 +39,10 @@ function HomeInner() {
       key === "image" ||
       key === "search" ||
       key === "tasks" ||
-      key === "pdf"
+      key === "pdf" ||
+      key === "studio"
     ) {
-      setActive(key);
+      setActive(key as ViewKey);
     }
   }
 
@@ -57,6 +59,7 @@ function HomeInner() {
       topBar={<TopBar />}
     >
       {active === "chat"   && <ChatView      key={`chat-${resetTick}`}   onChip={handleChip} />}
+      {active === "studio" && <StudioView    key={`studio-${resetTick}`} />}
       {active === "image"  && <ImageGenView  key={`image-${resetTick}`}  onSubmitPrompt={(v) => logToHistory("Image", v)} />}
       {active === "search" && <SearchView    key={`search-${resetTick}`} onSubmitPrompt={(v) => logToHistory("Search", v)} />}
       {active === "tasks"  && <TasksView     key={`tasks-${resetTick}`}  onSubmitPrompt={(v) => logToHistory("Task", v)} />}
