@@ -43,14 +43,14 @@ export function TopBar({ title, onShare, onRename, onExport, onDelete }: TopBarP
   const inSession = !!title;
 
   return (
-    <div className="grid h-11 w-full grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <div className="grid h-11 w-full grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
       {/* LEFT — reserved (keeps center column truly centered) */}
       <div aria-hidden />
 
       {/* CENTER — session title */}
       <div className="min-w-0 text-center">
         {inSession && (
-          <span className="block truncate text-[14px] font-medium tracking-tight text-foreground/90">
+          <span className="block truncate text-[12px] font-medium tracking-tight text-foreground/90 sm:text-[14px]">
             {title}
           </span>
         )}
@@ -118,10 +118,10 @@ export function TopBar({ title, onShare, onRename, onExport, onDelete }: TopBarP
           </>
         )}
 
-        {/* Credits + Upgrade pill */}
+        {/* Credits + Upgrade pill (hidden on very small widths) */}
         <button
           onClick={() => toast("Upgrade", { description: "Pricing coming soon" })}
-          className="group flex items-center gap-2 rounded-full border border-border bg-background py-1 pl-2.5 pr-1 text-[12px] text-foreground/80 transition-colors hover:bg-accent"
+          className="group hidden items-center gap-2 rounded-full border border-border bg-background py-1 pl-2.5 pr-1 text-[12px] text-foreground/80 transition-colors hover:bg-accent sm:flex"
         >
           <span className="flex items-center gap-1 text-foreground">
             <Zap className="h-3 w-3" strokeWidth={1.5} fill="currentColor" />

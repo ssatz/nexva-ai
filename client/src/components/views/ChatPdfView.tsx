@@ -116,7 +116,7 @@ export function ChatPdfView() {
 
   if (!active) {
     return (
-      <div className="flex flex-1 flex-col px-6 pt-6 pb-16">
+      <div className="flex flex-1 flex-col overflow-y-auto px-4 pt-6 pb-16 sm:px-6">
         {hiddenInput}
         <UploadHero onSelect={pickFile} onDrop={onDrop} />
         <RecentDocs docs={docs} onOpen={setActiveId} onDelete={deleteDoc} onAdd={pickFile} />
@@ -129,7 +129,7 @@ export function ChatPdfView() {
       {hiddenInput}
 
       {/* Sub top-bar */}
-      <div className="flex items-center justify-between px-6 pt-2 pb-3">
+      <div className="flex items-center justify-between px-4 pt-2 pb-3 sm:px-6">
         <button
           onClick={() => setActiveId(null)}
           className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-[12px] text-foreground/80 transition-colors hover:bg-accent"
@@ -143,8 +143,8 @@ export function ChatPdfView() {
         </div>
       </div>
 
-      {/* Two panes */}
-      <div className="flex flex-1 gap-3 px-3 pb-3">
+      {/* Two panes — stacked on mobile, side-by-side on ≥md */}
+      <div className="flex min-h-0 flex-1 flex-col gap-3 px-3 pb-3 md:flex-row">
         <PdfList
           docs={filtered}
           activeId={activeId}
@@ -322,7 +322,7 @@ function PdfList({
   setFilter: (v: string) => void;
 }) {
   return (
-    <aside className="flex w-[300px] shrink-0 flex-col rounded-2xl border border-border bg-card">
+    <aside className="flex w-full shrink-0 flex-col rounded-2xl border border-border bg-card md:w-[300px]">
       <div className="flex items-center gap-2 border-b border-border px-4 py-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background">
           <FileText className="h-4 w-4 text-foreground/70" strokeWidth={1.5} />
@@ -355,7 +355,7 @@ function PdfList({
         </div>
       </div>
 
-      <ul className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3">
+      <ul className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3 max-h-[240px] md:max-h-none">
         {docs.length === 0 ? (
           <li className="rounded-md px-2 py-3 text-center text-[12px] text-muted-foreground">
             No matches
@@ -461,24 +461,24 @@ function PdfChat({
   return (
     <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-card">
       {/* Sub header: model + file pill */}
-      <div className="flex items-center justify-between border-b border-border px-5 py-3">
-        <div className="flex items-center gap-2 text-[12px] text-foreground/70">
-          <div className="flex h-5 w-5 items-center justify-center rounded-full border border-border bg-background">
+      <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-3 sm:px-5">
+        <div className="flex items-center gap-2 text-[12px] text-foreground/70 shrink-0">
+          <div className="hidden h-5 w-5 items-center justify-center rounded-full border border-border bg-background sm:flex">
             <Box className="h-3 w-3" strokeWidth={1.5} />
           </div>
-          <span className="font-mono">nexva-1.0 · pdf</span>
+          <span className="font-mono">nexva-1.0</span>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-border bg-background py-1 pl-2 pr-3">
-          <FileText className="h-3.5 w-3.5 text-foreground/70" strokeWidth={1.5} />
-          <div className="flex items-baseline gap-2">
-            <span className="text-[12px] font-medium text-foreground">{doc.name}</span>
-            <span className="font-mono text-[10px] text-muted-foreground">{doc.size}</span>
+        <div className="flex min-w-0 items-center gap-2 rounded-full border border-border bg-background py-1 pl-2 pr-3">
+          <FileText className="h-3.5 w-3.5 shrink-0 text-foreground/70" strokeWidth={1.5} />
+          <div className="flex min-w-0 items-baseline gap-2">
+            <span className="truncate text-[12px] font-medium text-foreground">{doc.name}</span>
+            <span className="hidden font-mono text-[10px] text-muted-foreground sm:inline">{doc.size}</span>
           </div>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-6 py-6">
+      <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
         <div className="mx-auto flex max-w-[680px] flex-col gap-7">
           {messages.map((m) => (
             <div key={m.id} className="anim-fade-up">

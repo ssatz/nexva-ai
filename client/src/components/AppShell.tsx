@@ -1,8 +1,13 @@
 /*
-  AppShell — ElevenLabs-style sidebar with a collapse toggle next to the brand.
-  - Expanded (240px): brand wordmark, "New chat" row, icon+label nav, History section, footer rows.
-  - Collapsed (56px): monogram only, icon-only buttons with right-side tooltips, History hidden.
-  - State persists to localStorage ("nexva:sidebar:collapsed").
+  AppShell — responsive ElevenLabs-style sidebar.
+
+  Breakpoints:
+  - <md  (phone/tablet portrait): sidebar is an off-canvas drawer. A hamburger in the
+          sticky top bar opens it. Backdrop + body-scroll lock + Esc + route-change closes it.
+          When open, the drawer is always "expanded" (240px) — collapse toggle is hidden
+          because it doesn't make sense in a drawer.
+  - ≥md  (tablet landscape / desktop): static aside with collapse toggle (56px ↔ 240px),
+          state persisted to localStorage ("nexva:sidebar:collapsed").
 */
 
 import type { ReactNode } from "react";
@@ -19,6 +24,8 @@ import {
   Sparkles,
   PanelLeftClose,
   PanelLeft,
+  Menu,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHistory } from "@/contexts/HistoryContext";
@@ -49,7 +56,7 @@ export function AppShell({ active, onNavigate, onNewSession, topBar, children }:
   const { entries, activeId, setActiveId } = useHistory();
   const [historyOpen, setHistoryOpen] = useState(true);
 
-  // Collapsed state — initialize from localStorage on mount.
+  // Desktop collapse state (persists). On <md the drawer always renders expanded.
   const [collapsed, setCollapsed] = useState(false);
   useEffect(() => {
     try {
@@ -67,60 +74,103 @@ export function AppShell({ active, onNavigate, onNewSession, topBar, children }:
     }
   }, [collapsed]);
 
+  // Mobile drawer state
+  const [mobileOpen, setMobileOpen] = useState(false);
+  // Close on Esc
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mobileOpen]);
+  // Lock body scroll while drawer open
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileOpen]);
+  // Close on nav change
+  const go = (key: NavKey) => {
+    onNavigate(key);
+    setMobileOpen(false);
+  };
+
   const VISIBLE = 7;
   const visible = entries.slice(0, VISIBLE);
 
-  return (
-    <div className="relative z-10 flex h-screen w-full overflow-hidden bg-background">
-      {/* Sidebar — fixed to the viewport, scrolls independently */}
-      <aside
-        className={cn(
-          "sticky top-0 flex h-screen shrink-0 flex-col border-r border-border bg-sidebar",
-          "transition-[width] duration-200 ease-out",
-          collapsed ? "w-[56px]" : "w-[240px]",
-        )}
-      >
-        {/* Brand + collapse toggle */}
+  // The drawer content is shared between the static (≥md) aside and the mobile overlay.
+  // On mobile it renders *expanded* regardless of `collapsed`.
+  const renderSidebarContent = (opts: { forceExpanded?: boolean; showClose?: boolean }) => {
+    const isExpanded = opts.forceExpanded ? true : !collapsed;
+    return (
+      <>
+        {/* Brand + (collapse toggle on desktop / close on mobile) */}
         <div
           className={cn(
             "flex items-center pt-4 pb-3",
-            collapsed ? "flex-col gap-2 px-2" : "justify-between px-4",
+            isExpanded ? "justify-between px-4" : "flex-col gap-2 px-2",
           )}
         >
           <div className="flex items-center gap-2 min-w-0">
             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
               <span className="text-[12px] font-semibold leading-none">N</span>
             </div>
-            {!collapsed && (
+            {isExpanded && (
               <span className="truncate text-[14px] font-semibold tracking-tight text-foreground">
                 Nexva.ai
               </span>
             )}
           </div>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => setCollapsed((v) => !v)}
-                aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-                className="flex h-7 w-7 items-center justify-center rounded-md text-foreground/60 transition-colors hover:bg-accent hover:text-foreground"
-              >
-                {collapsed ? (
-                  <PanelLeft className="h-[15px] w-[15px]" strokeWidth={1.5} />
-                ) : (
-                  <PanelLeftClose className="h-[15px] w-[15px]" strokeWidth={1.5} />
-                )}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="text-xs">
-              {collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            </TooltipContent>
-          </Tooltip>
+          {opts.showClose ? (
+            <button
+              onClick={() => setMobileOpen(false)}
+              aria-label="Close sidebar"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-foreground/60 transition-colors hover:bg-accent hover:text-foreground"
+            >
+              <X className="h-[15px] w-[15px]" strokeWidth={1.5} />
+            </button>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setCollapsed((v) => !v)}
+                  aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                  className="flex h-7 w-7 items-center justify-center rounded-md text-foreground/60 transition-colors hover:bg-accent hover:text-foreground"
+                >
+                  {collapsed ? (
+                    <PanelLeft className="h-[15px] w-[15px]" strokeWidth={1.5} />
+                  ) : (
+                    <PanelLeftClose className="h-[15px] w-[15px]" strokeWidth={1.5} />
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="text-xs">
+                {collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
 
         {/* New chat */}
-        <div className={cn("pb-2", collapsed ? "px-2" : "px-3")}>
-          {collapsed ? (
+        <div className={cn("pb-2", isExpanded ? "px-3" : "px-2")}>
+          {isExpanded ? (
+            <button
+              onClick={() => {
+                onNewSession?.();
+                setMobileOpen(false);
+              }}
+              className="group flex w-full items-center gap-2.5 rounded-lg border border-border bg-background px-3 py-2 text-[13px] font-medium text-foreground transition-colors hover:bg-accent"
+            >
+              <Plus className="h-[15px] w-[15px]" strokeWidth={1.5} />
+              New chat
+            </button>
+          ) : (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
@@ -133,29 +183,21 @@ export function AppShell({ active, onNavigate, onNewSession, topBar, children }:
               </TooltipTrigger>
               <TooltipContent side="right" className="text-xs">New chat</TooltipContent>
             </Tooltip>
-          ) : (
-            <button
-              onClick={onNewSession}
-              className="group flex w-full items-center gap-2.5 rounded-lg border border-border bg-background px-3 py-2 text-[13px] font-medium text-foreground transition-colors hover:bg-accent"
-            >
-              <Plus className="h-[15px] w-[15px]" strokeWidth={1.5} />
-              New chat
-            </button>
           )}
         </div>
 
         {/* Primary nav */}
-        <nav className={cn("flex flex-col gap-0.5 pt-1", collapsed ? "px-2" : "px-2")}>
+        <nav className="flex flex-col gap-0.5 px-2 pt-1">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = item.key === active;
 
-            if (collapsed) {
+            if (!isExpanded) {
               return (
                 <Tooltip key={item.key}>
                   <TooltipTrigger asChild>
                     <button
-                      onClick={() => onNavigate(item.key)}
+                      onClick={() => go(item.key)}
                       aria-current={isActive ? "page" : undefined}
                       aria-label={item.label}
                       className={cn(
@@ -176,7 +218,7 @@ export function AppShell({ active, onNavigate, onNewSession, topBar, children }:
             return (
               <button
                 key={item.key}
-                onClick={() => onNavigate(item.key)}
+                onClick={() => go(item.key)}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] transition-colors duration-150",
@@ -193,7 +235,7 @@ export function AppShell({ active, onNavigate, onNewSession, topBar, children }:
         </nav>
 
         {/* History (expanded only) */}
-        {!collapsed && (
+        {isExpanded && (
           <div className="mt-5 flex min-h-0 flex-1 flex-col px-2">
             <button
               onClick={() => setHistoryOpen((v) => !v)}
@@ -222,7 +264,7 @@ export function AppShell({ active, onNavigate, onNewSession, topBar, children }:
                         <button
                           onClick={() => {
                             setActiveId(h.id);
-                            onNavigate("chat");
+                            go("chat");
                           }}
                           className={cn(
                             "block w-full truncate rounded-md px-2.5 py-1.5 text-left text-[13px] transition-colors hover:bg-accent hover:text-foreground",
@@ -252,36 +294,79 @@ export function AppShell({ active, onNavigate, onNewSession, topBar, children }:
           </div>
         )}
 
-        {/* Spacer when collapsed to push footer down */}
-        {collapsed && <div className="flex-1" />}
+        {/* Spacer when collapsed */}
+        {!isExpanded && <div className="flex-1" />}
 
         {/* Footer rows */}
         <div
           className={cn(
             "flex flex-col gap-0.5 border-t border-border",
-            collapsed ? "items-center p-2" : "p-2",
+            isExpanded ? "p-2" : "items-center p-2",
           )}
         >
           <FooterRow
-            collapsed={collapsed}
+            expanded={isExpanded}
             icon={<HelpCircle className="h-[15px] w-[15px]" strokeWidth={1.5} />}
             label="Help"
             onClick={() => toast("Help center", { description: "Coming soon" })}
           />
           <FooterRow
-            collapsed={collapsed}
+            expanded={isExpanded}
             icon={<Settings className="h-[15px] w-[15px]" strokeWidth={1.5} />}
             label="Settings"
             onClick={() => toast("Settings", { description: "Coming soon" })}
           />
         </div>
+      </>
+    );
+  };
+
+  return (
+    <div className="relative z-10 flex h-[100dvh] w-full overflow-hidden bg-background">
+      {/* Static desktop sidebar (≥md) */}
+      <aside
+        className={cn(
+          "sticky top-0 hidden h-[100dvh] shrink-0 flex-col border-r border-border bg-sidebar md:flex",
+          "transition-[width] duration-200 ease-out",
+          collapsed ? "w-[56px]" : "w-[240px]",
+        )}
+      >
+        {renderSidebarContent({ forceExpanded: false, showClose: false })}
       </aside>
 
-      {/* Canvas — fixed height; inner view decides what scrolls */}
-      <main className="relative flex h-screen min-h-0 flex-1 flex-col">
+      {/* Mobile drawer (<md) — off-canvas, overlay with backdrop */}
+      {/* Backdrop */}
+      <div
+        aria-hidden
+        onClick={() => setMobileOpen(false)}
+        className={cn(
+          "fixed inset-0 z-40 bg-foreground/30 backdrop-blur-[2px] transition-opacity duration-200 md:hidden",
+          mobileOpen ? "opacity-100" : "pointer-events-none opacity-0",
+        )}
+      />
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex h-[100dvh] w-[260px] max-w-[82vw] flex-col border-r border-border bg-sidebar shadow-xl md:hidden",
+          "transition-transform duration-250 ease-out",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
+        {renderSidebarContent({ forceExpanded: true, showClose: true })}
+      </aside>
+
+      {/* Canvas */}
+      <main className="relative flex h-[100dvh] min-h-0 w-full flex-1 flex-col">
         {topBar && (
-          <div className="sticky top-0 z-20 border-b border-border bg-background/85 px-6 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-            {topBar}
+          <div className="sticky top-0 z-20 flex items-center gap-2 border-b border-border bg-background/85 px-3 py-2 backdrop-blur sm:px-6 supports-[backdrop-filter]:bg-background/70">
+            {/* Hamburger (mobile only) */}
+            <button
+              onClick={() => setMobileOpen(true)}
+              aria-label="Open sidebar"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-accent hover:text-foreground md:hidden"
+            >
+              <Menu className="h-[17px] w-[17px]" strokeWidth={1.5} />
+            </button>
+            <div className="min-w-0 flex-1">{topBar}</div>
           </div>
         )}
         <div className="flex min-h-0 flex-1 flex-col">{children}</div>
@@ -294,14 +379,14 @@ function FooterRow({
   icon,
   label,
   onClick,
-  collapsed,
+  expanded,
 }: {
   icon: ReactNode;
   label: string;
   onClick?: () => void;
-  collapsed: boolean;
+  expanded: boolean;
 }) {
-  if (collapsed) {
+  if (!expanded) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>

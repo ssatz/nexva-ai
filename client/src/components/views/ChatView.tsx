@@ -97,13 +97,13 @@ export function ChatView({ onChip, onSessionTitleChange }: ChatViewProps) {
   // ---- Empty state ----
   if (messages.length === 0) {
     return (
-      <div className="flex flex-1 items-center justify-center overflow-y-auto px-6 pb-16">
+      <div className="flex flex-1 items-center justify-center overflow-y-auto px-4 pb-10 sm:px-6 sm:pb-16">
         <div className="w-full max-w-[720px] -mt-4">
-          <h1 className="text-center text-[40px] font-semibold leading-[1.1] tracking-tight text-foreground anim-fade-up sm:text-[44px]">
+          <h1 className="text-center text-[28px] font-semibold leading-[1.1] tracking-tight text-foreground anim-fade-up sm:text-[40px] md:text-[44px]">
             What needs to be done?
           </h1>
 
-          <div className="mt-8 anim-fade-up" style={{ animationDelay: "80ms" }}>
+          <div className="mt-6 anim-fade-up sm:mt-8" style={{ animationDelay: "80ms" }}>
             <ChatComposer onSubmit={send} />
             <ToolsStrip />
           </div>
@@ -131,7 +131,7 @@ export function ChatView({ onChip, onSessionTitleChange }: ChatViewProps) {
             })}
           </div>
 
-          <div className="mt-8 text-center text-[12px] text-muted-foreground">
+          <div className="mt-6 text-center text-[11px] text-muted-foreground sm:mt-8 sm:text-[12px]">
             Nexva can make mistakes. Verify important information.
           </div>
         </div>
@@ -155,7 +155,10 @@ export function ChatView({ onChip, onSessionTitleChange }: ChatViewProps) {
             className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-t from-background to-transparent"
             aria-hidden
           />
-          <div className="bg-background px-6 pb-6">
+          <div
+            className="bg-background px-3 pb-3 pt-0 sm:px-6 sm:pb-6"
+            style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+          >
             <div className="mx-auto w-full max-w-[760px]">
               <ChatComposer onSubmit={send} placeholder="Ask Nexva" />
               <div className="mt-2 text-center text-[11px] text-muted-foreground">
@@ -171,7 +174,7 @@ export function ChatView({ onChip, onSessionTitleChange }: ChatViewProps) {
   // ---- User-driven session (sticky composer, page-level scroll inside canvas) ----
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
-      <div className="flex justify-end px-6 pt-2">
+      <div className="flex justify-end px-4 pt-2 sm:px-6">
         <button
           onClick={clearSession}
           className="rounded-full border border-border bg-background px-3 py-1 text-[12px] text-foreground/70 hover:text-foreground transition-colors"
@@ -190,7 +193,10 @@ export function ChatView({ onChip, onSessionTitleChange }: ChatViewProps) {
           className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-t from-background to-transparent"
           aria-hidden
         />
-        <div className="bg-background px-6 pb-6">
+        <div
+          className="bg-background px-3 pb-3 pt-0 sm:px-6 sm:pb-6"
+          style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+        >
           <div className="mx-auto w-full max-w-[760px]">
             <ChatComposer onSubmit={send} />
             <ToolsStrip />

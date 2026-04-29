@@ -89,14 +89,14 @@ export function StudioView() {
   const canSend = !!value.trim();
 
   return (
-    <div className="flex flex-1 items-center justify-center px-6 pb-16">
+    <div className="flex flex-1 items-center justify-center overflow-y-auto px-4 pb-10 sm:px-6 sm:pb-16">
       <div className="w-full max-w-[860px] -mt-4">
         {/* Composer */}
         <div
           className="input-shelf w-full rounded-[22px] anim-fade-up"
           style={{ animationDelay: "60ms" }}
         >
-          <div className="flex flex-col gap-1 px-5 pt-4 pb-3">
+          <div className="flex flex-col gap-1 px-3 pt-3 pb-2 sm:px-5 sm:pt-4 sm:pb-3">
             <textarea
               ref={taRef}
               value={value}
@@ -125,19 +125,19 @@ export function StudioView() {
                 <button
                   type="button"
                   onClick={() => toast("Tools", { description: "Connect your tools — coming soon." })}
-                  className="flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px] text-foreground/75 transition-colors hover:bg-accent hover:text-foreground"
+                  className="flex h-8 items-center gap-1.5 rounded-full px-2 text-[13px] text-foreground/75 transition-colors hover:bg-accent hover:text-foreground sm:px-3"
                 >
                   <SlidersHorizontal className="h-[15px] w-[15px]" strokeWidth={1.75} />
-                  Tools
+                  <span className="hidden sm:inline">Tools</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => toast("Skills", { description: "Browse skills — coming soon." })}
-                  className="flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px] text-foreground/75 transition-colors hover:bg-accent hover:text-foreground"
+                  className="flex h-8 items-center gap-1.5 rounded-full px-2 text-[13px] text-foreground/75 transition-colors hover:bg-accent hover:text-foreground sm:px-3"
                 >
                   <Zap className="h-[15px] w-[15px]" strokeWidth={1.75} />
-                  Skill
+                  <span className="hidden sm:inline">Skill</span>
                 </button>
               </div>
 
@@ -145,10 +145,10 @@ export function StudioView() {
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
-                  className="flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px] text-foreground/75 transition-colors hover:bg-accent hover:text-foreground"
+                  className="flex h-8 items-center gap-1.5 rounded-full px-2 text-[13px] text-foreground/75 transition-colors hover:bg-accent hover:text-foreground sm:px-3"
                 >
                   <Wand2 className="h-[15px] w-[15px]" strokeWidth={1.75} />
-                  <span>Auto Model</span>
+                  <span className="hidden sm:inline">Auto Model</span>
                   <ChevronDown className="h-[13px] w-[13px]" strokeWidth={1.75} />
                 </button>
 
@@ -173,7 +173,7 @@ export function StudioView() {
 
         {/* Category tiles */}
         <div
-          className="mt-10 grid grid-cols-5 gap-x-4 gap-y-5 sm:grid-cols-9 anim-fade-up"
+          className="mt-8 grid grid-cols-3 gap-x-3 gap-y-5 sm:mt-10 sm:grid-cols-5 sm:gap-x-4 md:grid-cols-9 anim-fade-up"
           style={{ animationDelay: "140ms" }}
         >
           {CATEGORIES.map((c) => {

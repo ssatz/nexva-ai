@@ -52,16 +52,16 @@ export function SearchView({ onSubmitPrompt }: SearchViewProps = {}) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className="flex items-center justify-between px-6 pt-5">
+    <div className="flex flex-1 flex-col overflow-y-auto">
+      <div className="flex items-center justify-between px-4 pt-5 sm:px-6">
         <div className="text-[12px] font-medium text-foreground/70">Nexva.ai · Search</div>
         <button className="rounded-full border border-border bg-background px-3 py-1 text-[12px] text-foreground/80 hover:bg-accent transition-colors">
           Upgrade
         </button>
       </div>
 
-      <div className="mx-auto mt-20 w-full max-w-[720px] px-6 anim-fade-up">
-        <h2 className="text-center text-[36px] font-semibold leading-[1.1] tracking-tight text-foreground sm:text-[40px]">
+      <div className="mx-auto mt-10 w-full max-w-[720px] px-4 anim-fade-up sm:mt-20 sm:px-6">
+        <h2 className="text-center text-[26px] font-semibold leading-[1.1] tracking-tight text-foreground sm:text-[36px] md:text-[40px]">
           Ask the web a question.
         </h2>
 
@@ -73,9 +73,9 @@ export function SearchView({ onSubmitPrompt }: SearchViewProps = {}) {
         </div>
       </div>
 
-      <div className="mx-auto mt-12 w-full max-w-[760px] flex-1 px-6 pb-16">
+      <div className="mx-auto mt-8 w-full max-w-[760px] flex-1 px-4 pb-10 sm:mt-12 sm:px-6 sm:pb-16">
         {query === null ? (
-          <div className="rounded-2xl border border-dashed border-border bg-card/40 px-8 py-16 text-center">
+          <div className="rounded-2xl border border-dashed border-border bg-card/40 px-5 py-10 text-center sm:px-8 sm:py-16">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background">
               <Globe className="h-5 w-5 text-muted-foreground" strokeWidth={1.5} />
             </div>
