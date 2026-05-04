@@ -1,6 +1,6 @@
 /*
   ChatView — B&W minimal.
-  - Empty state: centered headline + composer + ToolsStrip + chip row.
+  - Empty state: centered headline + composer + chip row.
   - Brand-new session (user-driven): same as before — sticky composer above the thread.
   - Seeded history session (Gemini-reference layout):
       * TopBar shows the session title (set via onSessionTitleChange prop).
@@ -12,7 +12,6 @@
 import { useEffect, useState } from "react";
 import { ChatComposer } from "@/components/ChatComposer";
 import { ChatThread, type ChatMessage } from "@/components/ChatThread";
-import { ToolsStrip } from "@/components/ToolsStrip";
 import { useHistory } from "@/contexts/HistoryContext";
 import { MOCK_SESSIONS } from "@/data/mockSessions";
 import {
@@ -105,7 +104,6 @@ export function ChatView({ onChip, onSessionTitleChange }: ChatViewProps) {
 
           <div className="mt-6 anim-fade-up sm:mt-8" style={{ animationDelay: "80ms" }}>
             <ChatComposer onSubmit={send} />
-            <ToolsStrip />
           </div>
 
           <div
@@ -199,7 +197,6 @@ export function ChatView({ onChip, onSessionTitleChange }: ChatViewProps) {
         >
           <div className="mx-auto w-full max-w-[760px]">
             <ChatComposer onSubmit={send} />
-            <ToolsStrip />
           </div>
         </div>
       </div>

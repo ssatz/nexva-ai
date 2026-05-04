@@ -48,3 +48,14 @@
   - [ ] Rename "Search" → "My Chats" with chats icon
   - [ ] "+ New chat" styled as the dark split-button
 - [ ] Verify dev server / save checkpoint / deliver
+
+
+---
+
+# Todo — Composer model picker + cleanup
+
+- [ ] Read ChatComposer.tsx and ChatView.tsx
+- [ ] Replace nexva-1.0 pill with a searchable Model dropdown (Gemini 3.1 Flash Lite NEW, Grok 4.1 Fast, Claude 4.5 Haiku, Gemini 3.1 Pro NEW Pro, Claude 4.6 Sonnet NEW Pro) with icons + descriptions, search field at top
+- [ ] Remove the tips (lightbulb) and library (book) icons from the composer
+- [ ] Remove the "Connect your tools to Nexva" strip from the home view
+- [ ] Verify build, save checkpoint
