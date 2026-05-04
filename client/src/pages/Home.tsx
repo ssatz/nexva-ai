@@ -76,7 +76,7 @@ function HomeInner() {
       {active === "chat"   && <ChatView      key={`chat-${resetTick}`}   onChip={handleChip} onSessionTitleChange={onSessionTitleChange} />}
       {active === "studio" && <StudioView    key={`studio-${resetTick}`} />}
       {active === "image"  && <ImageGenView  key={`image-${resetTick}`}  onSubmitPrompt={(v) => logToHistory("Image", v)} />}
-      {active === "search" && <SearchView    key={`search-${resetTick}`} onSubmitPrompt={(v) => logToHistory("Search", v)} />}
+      {active === "search" && <SearchView    key={`search-${resetTick}`} onOpenChat={() => setActive("chat")} />}
       {active === "tasks"  && <TasksView     key={`tasks-${resetTick}`}  onSubmitPrompt={(v) => logToHistory("Task", v)} />}
       {active === "pdf"    && <ChatPdfView   key={`pdf-${resetTick}`} />}
     </AppShell>

@@ -15,12 +15,13 @@ import { useEffect, useState } from "react";
 import {
   MessageSquare,
   ImagePlus,
-  Search,
+  MessagesSquare,
   ListChecks,
   Plus,
   Settings,
   HelpCircle,
   ChevronRight,
+  ChevronDown,
   Sparkles,
   PanelLeftClose,
   PanelLeft,
@@ -35,11 +36,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 export type NavKey = "chat" | "image" | "search" | "tasks" | "studio";
 
 const NAV_ITEMS: { key: NavKey; label: string; icon: typeof MessageSquare }[] = [
-  { key: "chat",   label: "Chat",       icon: MessageSquare },
-  { key: "studio", label: "Studio",     icon: Sparkles },
-  { key: "image",  label: "Image Gen",  icon: ImagePlus },
-  { key: "search", label: "Search",     icon: Search },
-  { key: "tasks",  label: "Tasks",      icon: ListChecks },
+  { key: "chat",   label: "Chat",      icon: MessageSquare },
+  { key: "studio", label: "Studio",    icon: Sparkles },
+  { key: "image",  label: "Image Gen", icon: ImagePlus },
+  { key: "search", label: "My Chats",  icon: MessagesSquare },
+  { key: "tasks",  label: "Tasks",     icon: ListChecks },
 ];
 
 const STORAGE_KEY = "nexva:sidebar:collapsed";
@@ -160,25 +161,35 @@ export function AppShell({ active, onNavigate, onNewSession, topBar, children }:
         {/* New chat */}
         <div className={cn("pb-2", isExpanded ? "px-3" : "px-2")}>
           {isExpanded ? (
-            <button
-              onClick={() => {
-                onNewSession?.();
-                setMobileOpen(false);
-              }}
-              className="group flex w-full items-center gap-2.5 rounded-lg border border-border bg-background px-3 py-2 text-[13px] font-medium text-foreground transition-colors hover:bg-accent"
-            >
-              <Plus className="h-[15px] w-[15px]" strokeWidth={1.5} />
-              New chat
-            </button>
+            <div className="flex h-9 items-stretch overflow-hidden rounded-full bg-foreground text-background shadow-sm">
+              <button
+                onClick={() => {
+                  onNewSession?.();
+                  setMobileOpen(false);
+                }}
+                className="inline-flex flex-1 items-center justify-center gap-1.5 px-3 text-[13px] font-medium hover:opacity-90"
+              >
+                <Plus className="h-[14px] w-[14px]" strokeWidth={2} />
+                New chat
+              </button>
+              <div className="my-1.5 w-px bg-background/25" />
+              <button
+                onClick={() => toast("More options", { description: "Coming soon" })}
+                aria-label="More create options"
+                className="inline-flex items-center justify-center px-2.5 hover:opacity-90"
+              >
+                <ChevronDown className="h-[14px] w-[14px]" strokeWidth={2} />
+              </button>
+            </div>
           ) : (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={onNewSession}
                   aria-label="New chat"
-                  className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-background text-foreground transition-colors hover:bg-accent"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background transition-opacity hover:opacity-90"
                 >
-                  <Plus className="h-[16px] w-[16px]" strokeWidth={1.5} />
+                  <Plus className="h-[16px] w-[16px]" strokeWidth={2} />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="right" className="text-xs">New chat</TooltipContent>

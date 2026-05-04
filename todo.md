@@ -30,3 +30,21 @@
 ## Phase 6 — Save checkpoint and deliver
 - [ ] Run check-status.
 - [ ] Save checkpoint and send build URL.
+
+
+---
+
+# Todo — My Chats redesign (Search → My Chats)
+
+- [ ] Read SearchView.tsx, AppShell.tsx, HistoryContext.tsx
+- [ ] Rewrite SearchView as the "My Chats" page:
+  - [ ] Title "My Chats" + dark "+ Create new" split button (with caret)
+  - [ ] Search input with leading magnifier + trailing filter icon
+  - [ ] "{N} Chats" count + "Select" link
+  - [ ] Rows: title (semibold) + relative time, hairline dividers, hover bg + kebab
+  - [ ] Click row → loads the session in Chat view
+  - [ ] Empty state when no matches
+- [ ] Update AppShell sidebar:
+  - [ ] Rename "Search" → "My Chats" with chats icon
+  - [ ] "+ New chat" styled as the dark split-button
+- [ ] Verify dev server / save checkpoint / deliver
