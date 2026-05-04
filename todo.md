@@ -59,3 +59,16 @@
 - [ ] Remove the tips (lightbulb) and library (book) icons from the composer
 - [ ] Remove the "Connect your tools to Nexva" strip from the home view
 - [ ] Verify build, save checkpoint
+
+
+---
+
+# Todo — Mic + Chat controls
+
+- [ ] Replace send arrow with Mic icon when textarea is empty (single button that morphs)
+- [ ] Add Chat controls popover triggered by a Sliders icon next to the model picker
+  - [ ] Header "Chat controls"
+  - [ ] Section "Capabilities": Artifacts, Search, Image (with sub-picker "Nano Banana Pro"), Data Analysis, Think (R1) — each with a Switch toggle
+  - [ ] Section "Personalization": Custom Instructions (toggle + edit pencil), Response language (Auto picker)
+  - [ ] Persist toggles to local component state; toast on change
+- [ ] Verify build, save checkpoint

@@ -1,24 +1,44 @@
 /*
   ChatComposer — B&W minimal, Runable-inspired.
 
-  Update (2026-05-04):
-   - Removed the lightbulb (Tips) and book (Library) icon buttons.
-   - Replaced the static "nexva-1.0" label with a searchable Model picker
-     (popover) listing modern frontier models with NEW / Pro tags and the
-     emoji glyphs from the reference screenshot.
-   - All controls remain monochrome and on-brand.
+  Update (2026-05-04 b):
+   - The trailing button now MORPHS based on input state:
+       - Empty → Mic icon (taps toggle a "voice input" placeholder).
+       - Non-empty → Send arrow.
+   - Added a "Chat controls" popover (Sliders icon next to the model picker)
+     containing Capabilities (Artifacts, Search, Image w/ sub-picker,
+     Data Analysis, Think (R1)) and Personalization (Custom Instructions,
+     Response language). Toggles persist in local component state and
+     surface a toast on each change.
 
-  Layout:
-   - Top row: textarea (auto-grow).
-   - Bottom row: leading "+" attach button on the left,
-     model picker + circular send button on the right.
+  Layout (left to right on the bottom row):
+   left  : Plus (attach)
+   right : Sliders (chat controls) · Model picker · Mic / Send
 */
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { Plus, ArrowUp, ChevronDown, Search as SearchIcon, Check } from "lucide-react";
+import {
+  Plus,
+  ArrowUp,
+  Mic,
+  ChevronDown,
+  Search as SearchIcon,
+  Check,
+  SlidersHorizontal,
+  LayoutPanelTop,
+  Globe,
+  ImagePlus as ImagePlusIcon,
+  BarChart3,
+  Brain,
+  StickyNote,
+  Languages,
+  Pencil,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
 
 /* -------------------------- Model registry -------------------------- */
 
@@ -26,51 +46,23 @@ interface ModelOption {
   id: string;
   name: string;
   description: string;
-  /** Emoji used as the row glyph */
   glyph: string;
   isNew?: boolean;
   isPro?: boolean;
 }
 
 const MODELS: ModelOption[] = [
-  {
-    id: "gemini-3.1-flash-lite",
-    name: "Gemini 3.1 Flash Lite",
-    description: "Ultra-fast, light, efficient utility.",
-    glyph: "✦",
-    isNew: true,
-  },
-  {
-    id: "grok-4.1-fast",
-    name: "Grok 4.1 Fast",
-    description: "Instant replies, no thinking delay.",
-    glyph: "⊘",
-  },
-  {
-    id: "claude-4.5-haiku",
-    name: "Claude 4.5 Haiku",
-    description: "Our fastest, most concise model.",
-    glyph: "✺",
-  },
-  {
-    id: "gemini-3.1-pro",
-    name: "Gemini 3.1 Pro",
-    description: "Deep research & multi-step logic.",
-    glyph: "✦",
-    isNew: true,
-    isPro: true,
-  },
-  {
-    id: "claude-4.6-sonnet",
-    name: "Claude 4.6 Sonnet",
-    description: "Best for coding & deep analysis.",
-    glyph: "✺",
-    isNew: true,
-    isPro: true,
-  },
+  { id: "gemini-3.1-flash-lite", name: "Gemini 3.1 Flash Lite", description: "Ultra-fast, light, efficient utility.",      glyph: "✦", isNew: true },
+  { id: "grok-4.1-fast",         name: "Grok 4.1 Fast",         description: "Instant replies, no thinking delay.",         glyph: "⊘" },
+  { id: "claude-4.5-haiku",      name: "Claude 4.5 Haiku",      description: "Our fastest, most concise model.",            glyph: "✺" },
+  { id: "gemini-3.1-pro",        name: "Gemini 3.1 Pro",        description: "Deep research & multi-step logic.",           glyph: "✦", isNew: true, isPro: true },
+  { id: "claude-4.6-sonnet",     name: "Claude 4.6 Sonnet",     description: "Best for coding & deep analysis.",            glyph: "✺", isNew: true, isPro: true },
 ];
 
 const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite";
+
+const IMAGE_MODELS = ["Nano Banana Pro", "Imagen 4", "Flux 1.1", "DALL·E 3"];
+const LANGUAGES   = ["Auto", "English", "Spanish", "French", "German", "Hindi", "Japanese"];
 
 /* -------------------------- Component -------------------------- */
 
@@ -78,9 +70,7 @@ interface ChatComposerProps {
   placeholder?: string;
   onSubmit: (value: string) => void;
   disabled?: boolean;
-  /** Optional: notify parent when the user picks a different model. */
   onModelChange?: (modelId: string) => void;
-  /** Optional: control the selected model from outside. */
   modelId?: string;
 }
 
@@ -123,6 +113,10 @@ export function ChatComposer({
     setValue("");
   }
 
+  function startVoice() {
+    toast("Voice input", { description: "Speech-to-text coming soon." });
+  }
+
   const canSend = !!value.trim() && !disabled;
 
   return (
@@ -159,25 +153,34 @@ export function ChatComposer({
           </div>
 
           <div className="flex items-center gap-1.5">
-            <ModelPicker
-              activeId={activeModel.id}
-              onPick={pickModel}
-            />
+            <ChatControlsPopover />
+            <ModelPicker activeId={activeModel.id} onPick={pickModel} />
 
-            <button
-              type="button"
-              onClick={submit}
-              disabled={!canSend}
-              aria-label="Send"
-              className={cn(
-                "ml-1 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-150",
-                canSend
-                  ? "bg-foreground text-background hover:opacity-90"
-                  : "border border-border text-muted-foreground cursor-not-allowed",
-              )}
-            >
-              <ArrowUp className="h-[15px] w-[15px]" strokeWidth={2} />
-            </button>
+            {/* Mic-when-empty / Send-when-typing */}
+            {canSend ? (
+              <button
+                type="button"
+                onClick={submit}
+                aria-label="Send"
+                className="ml-1 flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-background transition-opacity hover:opacity-90"
+              >
+                <ArrowUp className="h-[15px] w-[15px]" strokeWidth={2} />
+              </button>
+            ) : (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={startVoice}
+                    aria-label="Voice input"
+                    className="ml-1 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
+                  >
+                    <Mic className="h-[15px] w-[15px]" strokeWidth={1.75} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-xs">Voice input</TooltipContent>
+              </Tooltip>
+            )}
           </div>
         </div>
       </div>
@@ -227,7 +230,6 @@ function ModelPicker({
         sideOffset={8}
         className="w-[340px] rounded-2xl border border-border bg-card p-2 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.18)]"
       >
-        {/* Search row */}
         <div className="relative">
           <SearchIcon
             className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
@@ -243,7 +245,6 @@ function ModelPicker({
           />
         </div>
 
-        {/* Model rows */}
         <div className="mt-2 flex max-h-[320px] flex-col overflow-y-auto pr-0.5">
           {filtered.length === 0 ? (
             <div className="px-2 py-6 text-center text-[12.5px] text-muted-foreground">
@@ -276,15 +277,11 @@ function ModelPicker({
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="truncate text-[13.5px] font-semibold text-foreground">
-                        {m.name}
-                      </span>
+                      <span className="truncate text-[13.5px] font-semibold text-foreground">{m.name}</span>
                       {m.isNew && <BadgeNew />}
                       {m.isPro && <BadgePro />}
                     </div>
-                    <div className="mt-0.5 truncate text-[12px] text-muted-foreground">
-                      {m.description}
-                    </div>
+                    <div className="mt-0.5 truncate text-[12px] text-muted-foreground">{m.description}</div>
                   </div>
                   {isActive && (
                     <Check className="mt-1 h-3.5 w-3.5 shrink-0 text-foreground" strokeWidth={2} />
@@ -298,6 +295,237 @@ function ModelPicker({
     </Popover>
   );
 }
+
+/* -------------------------- Chat controls popover -------------------------- */
+
+interface Capabilities {
+  artifacts: boolean;
+  search: boolean;
+  image: boolean;
+  imageModel: string;
+  dataAnalysis: boolean;
+  think: boolean;
+  customInstructions: boolean;
+  language: string;
+}
+
+const DEFAULT_CAPS: Capabilities = {
+  artifacts: false,
+  search: false,
+  image: false,
+  imageModel: "Nano Banana Pro",
+  dataAnalysis: false,
+  think: false,
+  customInstructions: false,
+  language: "Auto",
+};
+
+function ChatControlsPopover() {
+  const [open, setOpen] = useState(false);
+  const [caps, setCaps] = useState<Capabilities>(DEFAULT_CAPS);
+
+  const enabledCount =
+    Number(caps.artifacts) +
+    Number(caps.search) +
+    Number(caps.image) +
+    Number(caps.dataAnalysis) +
+    Number(caps.think);
+
+  function update<K extends keyof Capabilities>(key: K, value: Capabilities[K], label?: string) {
+    setCaps((c) => ({ ...c, [key]: value }));
+    if (label) {
+      const isToggle = typeof value === "boolean";
+      toast(label, {
+        description: isToggle ? (value ? "Enabled" : "Disabled") : `Set to ${value}`,
+      });
+    }
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              aria-label="Chat controls"
+              className={cn(
+                "relative flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-foreground/75 transition-colors hover:bg-accent hover:text-foreground",
+                enabledCount > 0 && "border-foreground/40 text-foreground",
+              )}
+            >
+              <SlidersHorizontal className="h-[15px] w-[15px]" strokeWidth={1.75} />
+              {enabledCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-foreground px-1 text-[9px] font-semibold leading-none text-background">
+                  {enabledCount}
+                </span>
+              )}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="text-xs">Chat controls</TooltipContent>
+        </Tooltip>
+      </PopoverTrigger>
+      <PopoverContent
+        align="end"
+        side="top"
+        sideOffset={8}
+        className="w-[320px] rounded-2xl border border-border bg-card p-3 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.18)]"
+      >
+        <div className="px-1 pb-1 text-[14px] font-semibold text-foreground">Chat controls</div>
+
+        {/* Capabilities */}
+        <div className="mt-1.5 px-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          Capabilities
+        </div>
+        <div className="mt-1 flex flex-col">
+          <CapabilityRow
+            icon={<LayoutPanelTop className="h-4 w-4" strokeWidth={1.6} />}
+            label="Artifacts"
+            checked={caps.artifacts}
+            onChange={(v) => update("artifacts", v, "Artifacts")}
+          />
+          <CapabilityRow
+            icon={<Globe className="h-4 w-4" strokeWidth={1.6} />}
+            label="Search"
+            checked={caps.search}
+            onChange={(v) => update("search", v, "Search")}
+          />
+          <CapabilityRow
+            icon={<ImagePlusIcon className="h-4 w-4" strokeWidth={1.6} />}
+            label="Image"
+            checked={caps.image}
+            onChange={(v) => update("image", v, "Image")}
+            extra={
+              caps.image && (
+                <SubPicker
+                  value={caps.imageModel}
+                  options={IMAGE_MODELS}
+                  onChange={(v) => update("imageModel", v, "Image model")}
+                />
+              )
+            }
+          />
+          <CapabilityRow
+            icon={<BarChart3 className="h-4 w-4" strokeWidth={1.6} />}
+            label="Data Analysis"
+            checked={caps.dataAnalysis}
+            onChange={(v) => update("dataAnalysis", v, "Data Analysis")}
+          />
+          <CapabilityRow
+            icon={<Brain className="h-4 w-4" strokeWidth={1.6} />}
+            label="Think (R1)"
+            checked={caps.think}
+            onChange={(v) => update("think", v, "Think (R1)")}
+          />
+        </div>
+
+        {/* Personalization */}
+        <div className="mt-3 border-t border-border pt-2.5 px-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          Personalization
+        </div>
+        <div className="mt-1 flex flex-col">
+          <CapabilityRow
+            icon={<StickyNote className="h-4 w-4" strokeWidth={1.6} />}
+            label="Custom Instructions"
+            checked={caps.customInstructions}
+            onChange={(v) => update("customInstructions", v, "Custom Instructions")}
+            extra={
+              <button
+                type="button"
+                onClick={() => toast("Edit instructions", { description: "Coming soon" })}
+                aria-label="Edit custom instructions"
+                className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+              >
+                <Pencil className="h-3.5 w-3.5" strokeWidth={1.6} />
+              </button>
+            }
+          />
+          <div className="flex items-center justify-between gap-3 rounded-lg px-2 py-2">
+            <div className="flex min-w-0 items-center gap-2.5 text-foreground/85">
+              <span className="text-foreground/70">
+                <Languages className="h-4 w-4" strokeWidth={1.6} />
+              </span>
+              <span className="text-[13px]">Response language</span>
+            </div>
+            <SubPicker
+              value={caps.language}
+              options={LANGUAGES}
+              onChange={(v) => update("language", v, "Response language")}
+            />
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function CapabilityRow({
+  icon, label, checked, onChange, extra,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  extra?: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-lg px-2 py-2 transition-colors hover:bg-muted/50">
+      <div className="flex min-w-0 items-center gap-2.5 text-foreground/85">
+        <span className="text-foreground/70">{icon}</span>
+        <span className="truncate text-[13px]">{label}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        {extra}
+        <Switch checked={checked} onCheckedChange={onChange} />
+      </div>
+    </div>
+  );
+}
+
+function SubPicker({
+  value, options, onChange,
+}: { value: string; options: string[]; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="inline-flex max-w-[140px] items-center gap-1 rounded-md px-1.5 py-0.5 text-[12px] text-foreground/80 hover:bg-accent hover:text-foreground"
+        >
+          <span className="truncate">{value}</span>
+          <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" strokeWidth={1.75} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="end"
+        side="top"
+        sideOffset={6}
+        className="w-[180px] rounded-xl border border-border bg-card p-1 shadow-md"
+      >
+        {options.map((o) => {
+          const isActive = o === value;
+          return (
+            <button
+              key={o}
+              type="button"
+              onClick={() => { onChange(o); setOpen(false); }}
+              className={cn(
+                "flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-[13px] transition-colors",
+                isActive ? "bg-muted text-foreground" : "text-foreground/80 hover:bg-muted/60",
+              )}
+            >
+              <span className="truncate">{o}</span>
+              {isActive && <Check className="h-3.5 w-3.5 shrink-0 text-foreground" strokeWidth={2} />}
+            </button>
+          );
+        })}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+/* -------------------------- Tag primitives -------------------------- */
 
 function BadgeNew() {
   return (
