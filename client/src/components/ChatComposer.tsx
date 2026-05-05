@@ -143,7 +143,7 @@ export function ChatComposer({
         />
 
         <div className="flex items-center justify-between gap-2 pt-1">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
@@ -156,10 +156,10 @@ export function ChatComposer({
               </TooltipTrigger>
               <TooltipContent side="top" className="text-xs">Attach</TooltipContent>
             </Tooltip>
+            <ChatControlsPopover />
           </div>
 
           <div className="flex items-center gap-1.5">
-            <ChatControlsPopover />
             <ModelPicker activeId={activeModel.id} onPick={pickModel} />
 
             {/* Mic-when-empty / Send-when-typing */}
@@ -354,25 +354,26 @@ function ChatControlsPopover() {
           <TooltipTrigger asChild>
             <button
               type="button"
-              aria-label="Chat controls"
+              aria-label="Tools"
               className={cn(
-                "relative flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-foreground/75 transition-colors hover:bg-accent hover:text-foreground",
+                "relative flex h-8 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-foreground/80 transition-colors hover:bg-accent hover:text-foreground",
                 enabledCount > 0 && "border-foreground/40 text-foreground",
               )}
             >
-              <SlidersHorizontal className="h-[15px] w-[15px]" strokeWidth={1.75} />
+              <SlidersHorizontal className="h-[14px] w-[14px]" strokeWidth={1.75} />
+              <span className="text-[12.5px] font-medium">Tools</span>
               {enabledCount > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-foreground px-1 text-[9px] font-semibold leading-none text-background">
+                <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-foreground px-1 text-[9px] font-semibold leading-none text-background">
                   {enabledCount}
                 </span>
               )}
             </button>
           </TooltipTrigger>
-          <TooltipContent side="top" className="text-xs">Chat controls</TooltipContent>
+          <TooltipContent side="top" className="text-xs">Tools & controls</TooltipContent>
         </Tooltip>
       </PopoverTrigger>
       <PopoverContent
-        align="end"
+        align="start"
         side="top"
         sideOffset={8}
         className="w-[320px] rounded-2xl border border-border bg-card p-3 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.18)]"
