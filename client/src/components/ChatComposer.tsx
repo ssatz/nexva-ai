@@ -33,6 +33,12 @@ import {
   StickyNote,
   Languages,
   Pencil,
+  Wand2,
+  Square,
+  Lightbulb,
+  Film,
+  Music,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -373,6 +379,44 @@ function ChatControlsPopover() {
       >
         <div className="px-1 pb-1 text-[14px] font-semibold text-foreground">Chat controls</div>
 
+        {/* Tools */}
+        <div className="mt-2.5 px-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          Tools
+        </div>
+        <div className="mt-1 flex flex-col">
+          <ToolRow
+            icon={<ImagePlusIcon className="h-4 w-4" strokeWidth={1.6} />}
+            label="Create image"
+            onClick={() => { toast("Create image", { description: "Opening image generator..." }); setOpen(false); }}
+          />
+          <ToolRow
+            icon={<Square className="h-4 w-4" strokeWidth={1.6} />}
+            label="Canvas"
+            onClick={() => { toast("Canvas", { description: "Opening canvas..." }); setOpen(false); }}
+          />
+          <ToolRow
+            icon={<Lightbulb className="h-4 w-4" strokeWidth={1.6} />}
+            label="Deep research"
+            onClick={() => { toast("Deep research", { description: "Starting research..." }); setOpen(false); }}
+          />
+          <ToolRow
+            icon={<Film className="h-4 w-4" strokeWidth={1.6} />}
+            label="Create video"
+            onClick={() => { toast("Create video", { description: "Opening video generator..." }); setOpen(false); }}
+          />
+          <ToolRow
+            icon={<Music className="h-4 w-4" strokeWidth={1.6} />}
+            label="Create music"
+            badge="New"
+            onClick={() => { toast("Create music", { description: "Opening music generator..." }); setOpen(false); }}
+          />
+          <ToolRow
+            icon={<BookOpen className="h-4 w-4" strokeWidth={1.6} />}
+            label="Learn"
+            onClick={() => { toast("Learn", { description: "Opening learning resources..." }); setOpen(false); }}
+          />
+        </div>
+
         {/* Capabilities */}
         <div className="mt-1.5 px-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           Capabilities
@@ -420,7 +464,7 @@ function ChatControlsPopover() {
         </div>
 
         {/* Personalization */}
-        <div className="mt-3 border-t border-border pt-2.5 px-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        <div className="mt-2.5 border-t border-border pt-2.5 px-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           Personalization
         </div>
         <div className="mt-1 flex flex-col">
@@ -456,6 +500,33 @@ function ChatControlsPopover() {
         </div>
       </PopoverContent>
     </Popover>
+  );
+}
+
+function ToolRow({
+  icon, label, badge, onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  badge?: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center justify-between gap-2 rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-muted/50"
+    >
+      <div className="flex min-w-0 items-center gap-2.5 text-foreground/85">
+        <span className="text-foreground/70">{icon}</span>
+        <span className="truncate text-[13px]">{label}</span>
+      </div>
+      {badge && (
+        <span className="rounded-md bg-foreground/8 px-1.5 py-px text-[9px] font-semibold uppercase tracking-wider text-foreground/80 shrink-0">
+          {badge}
+        </span>
+      )}
+    </button>
   );
 }
 
