@@ -386,33 +386,33 @@ function ChatControlsPopover() {
         </div>
         <div className="mt-1 flex flex-col">
           <ToolRow
-            icon={<ImagePlusIcon className="h-4 w-4" strokeWidth={1.6} />}
+            icon={<ImagePlusIcon className="h-4 w-4 text-orange-500" strokeWidth={1.6} />}
             label="Create image"
             onClick={() => { toast("Create image", { description: "Opening image generator..." }); setOpen(false); }}
           />
           <ToolRow
-            icon={<Square className="h-4 w-4" strokeWidth={1.6} />}
+            icon={<Square className="h-4 w-4 text-emerald-500" strokeWidth={1.6} />}
             label="Canvas"
             onClick={() => { toast("Canvas", { description: "Opening canvas..." }); setOpen(false); }}
           />
           <ToolRow
-            icon={<Lightbulb className="h-4 w-4" strokeWidth={1.6} />}
+            icon={<Lightbulb className="h-4 w-4 text-amber-500" strokeWidth={1.6} />}
             label="Deep research"
             onClick={() => { toast("Deep research", { description: "Starting research..." }); setOpen(false); }}
           />
           <ToolRow
-            icon={<Film className="h-4 w-4" strokeWidth={1.6} />}
+            icon={<Film className="h-4 w-4 text-rose-500" strokeWidth={1.6} />}
             label="Create video"
             onClick={() => { toast("Create video", { description: "Opening video generator..." }); setOpen(false); }}
           />
           <ToolRow
-            icon={<Music className="h-4 w-4" strokeWidth={1.6} />}
+            icon={<Music className="h-4 w-4 text-violet-500" strokeWidth={1.6} />}
             label="Create music"
             badge="New"
             onClick={() => { toast("Create music", { description: "Opening music generator..." }); setOpen(false); }}
           />
           <ToolRow
-            icon={<BookOpen className="h-4 w-4" strokeWidth={1.6} />}
+            icon={<BookOpen className="h-4 w-4 text-blue-500" strokeWidth={1.6} />}
             label="Learn"
             onClick={() => { toast("Learn", { description: "Opening learning resources..." }); setOpen(false); }}
           />
@@ -424,19 +424,19 @@ function ChatControlsPopover() {
         </div>
         <div className="mt-1 flex flex-col">
           <CapabilityRow
-            icon={<LayoutPanelTop className="h-4 w-4" strokeWidth={1.6} />}
+            icon={<LayoutPanelTop className="h-4 w-4 text-emerald-500" strokeWidth={1.6} />}
             label="Artifacts"
             checked={caps.artifacts}
             onChange={(v) => update("artifacts", v, "Artifacts")}
           />
           <CapabilityRow
-            icon={<Globe className="h-4 w-4" strokeWidth={1.6} />}
+            icon={<Globe className="h-4 w-4 text-sky-500" strokeWidth={1.6} />}
             label="Search"
             checked={caps.search}
             onChange={(v) => update("search", v, "Search")}
           />
           <CapabilityRow
-            icon={<ImagePlusIcon className="h-4 w-4" strokeWidth={1.6} />}
+            icon={<ImagePlusIcon className="h-4 w-4 text-orange-500" strokeWidth={1.6} />}
             label="Image"
             checked={caps.image}
             onChange={(v) => update("image", v, "Image")}
@@ -451,13 +451,13 @@ function ChatControlsPopover() {
             }
           />
           <CapabilityRow
-            icon={<BarChart3 className="h-4 w-4" strokeWidth={1.6} />}
+            icon={<BarChart3 className="h-4 w-4 text-blue-500" strokeWidth={1.6} />}
             label="Data Analysis"
             checked={caps.dataAnalysis}
             onChange={(v) => update("dataAnalysis", v, "Data Analysis")}
           />
           <CapabilityRow
-            icon={<Brain className="h-4 w-4" strokeWidth={1.6} />}
+            icon={<Brain className="h-4 w-4 text-indigo-500" strokeWidth={1.6} />}
             label="Think (R1)"
             checked={caps.think}
             onChange={(v) => update("think", v, "Think (R1)")}
@@ -470,7 +470,7 @@ function ChatControlsPopover() {
         </div>
         <div className="mt-1 flex flex-col">
           <CapabilityRow
-            icon={<StickyNote className="h-4 w-4" strokeWidth={1.6} />}
+            icon={<StickyNote className="h-4 w-4 text-violet-500" strokeWidth={1.6} />}
             label="Custom Instructions"
             checked={caps.customInstructions}
             onChange={(v) => update("customInstructions", v, "Custom Instructions")}
@@ -519,7 +519,7 @@ function ToolRow({
       className="flex items-center justify-between gap-2 rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-muted/50"
     >
       <div className="flex min-w-0 items-center gap-2.5 text-foreground/85">
-        <span className="text-foreground/70">{icon}</span>
+        <span className="shrink-0">{icon}</span>
         <span className="truncate text-[13px]">{label}</span>
       </div>
       {badge && (
@@ -543,7 +543,7 @@ function CapabilityRow({
   return (
     <div className="flex items-center justify-between gap-2 rounded-lg px-2 py-2 transition-colors hover:bg-muted/50">
       <div className="flex min-w-0 items-center gap-2.5 text-foreground/85">
-        <span className="text-foreground/70">{icon}</span>
+        <span className="shrink-0">{icon}</span>
         <span className="truncate text-[13px]">{label}</span>
       </div>
       <div className="flex items-center gap-2">
