@@ -1,7 +1,7 @@
 /*
   ChatComposer — B&W minimal, Runable-inspired.
 
-  Update (2026-05-04 b):
+  Update (2026-05-05 e — cache-bust rebuild for ZIP):
    - The trailing button now MORPHS based on input state:
        - Empty → Mic icon (taps toggle a "voice input" placeholder).
        - Non-empty → Send arrow.
