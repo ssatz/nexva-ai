@@ -350,27 +350,23 @@ function ChatControlsPopover() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              aria-label="Tools"
-              className={cn(
-                "relative flex h-8 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-foreground/80 transition-colors hover:bg-accent hover:text-foreground",
-                enabledCount > 0 && "border-foreground/40 text-foreground",
-              )}
-            >
-              <SlidersHorizontal className="h-[14px] w-[14px]" strokeWidth={1.75} />
-              <span className="text-[12.5px] font-medium">Tools</span>
-              {enabledCount > 0 && (
-                <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-foreground px-1 text-[9px] font-semibold leading-none text-background">
-                  {enabledCount}
-                </span>
-              )}
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="top" className="text-xs">Tools & controls</TooltipContent>
-        </Tooltip>
+        <button
+          type="button"
+          aria-label="Tools"
+          title="Tools & controls"
+          className={cn(
+            "relative flex h-8 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-foreground/80 transition-colors hover:bg-accent hover:text-foreground",
+            enabledCount > 0 && "border-foreground/40 text-foreground",
+          )}
+        >
+          <SlidersHorizontal className="h-[14px] w-[14px]" strokeWidth={1.75} />
+          <span className="text-[12.5px] font-medium">Tools</span>
+          {enabledCount > 0 && (
+            <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-foreground px-1 text-[9px] font-semibold leading-none text-background">
+              {enabledCount}
+            </span>
+          )}
+        </button>
       </PopoverTrigger>
       <PopoverContent
         align="start"
