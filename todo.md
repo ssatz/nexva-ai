@@ -72,3 +72,15 @@
   - [ ] Section "Personalization": Custom Instructions (toggle + edit pencil), Response language (Auto picker)
   - [ ] Persist toggles to local component state; toast on change
 - [ ] Verify build, save checkpoint
+
+
+---
+
+# Todo — Chat message edit + assistant action bar
+
+- [ ] Inspect ChatView and HistoryContext to find message render + reply pipeline
+- [ ] User message: hover bar with pencil (edit) + copy buttons
+- [ ] User edit: inline textarea with Cancel/Save; on Save, overwrite, drop subsequent messages, regenerate assistant reply
+- [ ] Assistant message: hover bar with copy, thumbs-up, thumbs-down, regenerate
+- [ ] Regenerate: replay prior user message and replace current assistant bubble
+- [ ] Build / checkpoint / GitHub push / deliver

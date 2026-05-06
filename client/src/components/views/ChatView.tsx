@@ -70,6 +70,14 @@ export function ChatView({ onChip, onSessionTitleChange }: ChatViewProps) {
       userMsg,
       { id: pendingId, role: "assistant", content: "", pending: true },
     ]);
+    streamMockReply(pendingId, text);
+  }
+
+  /**
+   * Simulates an assistant reply landing into a pending bubble.
+   * Centralized so it can be reused by both send() and regenerate().
+   */
+  function streamMockReply(pendingId: string, sourceText: string) {
     setTimeout(() => {
       setMessages((m) =>
         m.map((msg) =>
@@ -79,12 +87,62 @@ export function ChatView({ onChip, onSessionTitleChange }: ChatViewProps) {
                 pending: false,
                 content:
                   "This is a preview interface. Connect a model provider to enable live responses — for now, your prompt was:\n\n> " +
-                  text,
+                  sourceText,
               }
             : msg,
         ),
       );
     }, 900);
+  }
+
+  /**
+   * User edited one of their previous messages. Replace its content,
+   * delete every message that came after it, append a fresh pending
+   * assistant bubble, and regenerate.
+   */
+  function handleEditUser(id: string, newText: string) {
+    setMessages((m) => {
+      const idx = m.findIndex((msg) => msg.id === id);
+      if (idx === -1) return m;
+      const head = m.slice(0, idx);
+      const editedUser: ChatMessage = { ...m[idx], content: newText };
+      const pendingId = crypto.randomUUID();
+      const next: ChatMessage[] = [
+        ...head,
+        editedUser,
+        { id: pendingId, role: "assistant", content: "", pending: true },
+      ];
+      streamMockReply(pendingId, newText);
+      toast("Message edited", { description: "Generating a fresh response…" });
+      return next;
+    });
+  }
+
+  /**
+   * Regenerate an assistant message: find the user message that produced it
+   * (the most recent user message before this assistant index) and reset the
+   * assistant bubble to pending, then stream a new mock reply.
+   */
+  function handleRegenerate(assistantId: string) {
+    setMessages((m) => {
+      const idx = m.findIndex((msg) => msg.id === assistantId);
+      if (idx === -1) return m;
+      let userText = "";
+      for (let i = idx - 1; i >= 0; i--) {
+        if (m[i].role === "user") {
+          userText = m[i].content;
+          break;
+        }
+      }
+      if (!userText) return m;
+      const newPendingId = crypto.randomUUID();
+      const next = m.slice(0, idx).concat([
+        { id: newPendingId, role: "assistant", content: "", pending: true },
+      ]);
+      streamMockReply(newPendingId, userText);
+      toast("Regenerating response…");
+      return next;
+    });
   }
 
   function clearSession() {
@@ -143,7 +201,11 @@ export function ChatView({ onChip, onSessionTitleChange }: ChatViewProps) {
       <div className="relative flex min-h-0 flex-1 flex-col">
         {/* Thread — the ONLY scrollable region */}
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <ChatThread messages={messages} />
+          <ChatThread
+            messages={messages}
+            onEditUser={handleEditUser}
+            onRegenerate={handleRegenerate}
+          />
           <div className="h-[160px]" aria-hidden />
         </div>
 
@@ -182,7 +244,11 @@ export function ChatView({ onChip, onSessionTitleChange }: ChatViewProps) {
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <ChatThread messages={messages} />
+        <ChatThread
+          messages={messages}
+          onEditUser={handleEditUser}
+          onRegenerate={handleRegenerate}
+        />
         <div className="h-[160px]" aria-hidden />
       </div>
 
