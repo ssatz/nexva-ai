@@ -33,7 +33,7 @@ import { useHistory } from "@/contexts/HistoryContext";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-export type NavKey = "chat" | "image" | "search" | "tasks" | "studio";
+export type NavKey = "chat" | "image" | "search" | "tasks" | "studio" | "settings";
 
 const NAV_ITEMS: { key: NavKey; label: string; icon: typeof MessageSquare }[] = [
   { key: "chat",   label: "Chat",      icon: MessageSquare },
@@ -325,7 +325,7 @@ export function AppShell({ active, onNavigate, onNewSession, topBar, children }:
             expanded={isExpanded}
             icon={<Settings className="h-[15px] w-[15px]" strokeWidth={1.5} />}
             label="Settings"
-            onClick={() => toast("Settings", { description: "Coming soon" })}
+            onClick={() => go("settings")}
           />
         </div>
       </>

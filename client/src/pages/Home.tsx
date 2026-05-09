@@ -15,9 +15,10 @@ import { SearchView } from "@/components/views/SearchView";
 import { TasksView } from "@/components/views/TasksView";
 import { ChatPdfView } from "@/components/views/ChatPdfView";
 import { StudioView } from "@/components/views/StudioView";
+import { SettingsView } from "@/components/views/SettingsView";
 import { toast } from "sonner";
 
-type ViewKey = NavKey | "pdf";
+type ViewKey = NavKey | "pdf" | "settings";
 
 function HomeInner() {
   const [active, setActive] = useState<ViewKey>("chat");
@@ -43,7 +44,8 @@ function HomeInner() {
       key === "search" ||
       key === "tasks" ||
       key === "pdf" ||
-      key === "studio"
+      key === "studio" ||
+      key === "settings"
     ) {
       setActive(key as ViewKey);
     }
@@ -73,12 +75,13 @@ function HomeInner() {
         />
       }
     >
-      {active === "chat"   && <ChatView      key={`chat-${resetTick}`}   onChip={handleChip} onSessionTitleChange={onSessionTitleChange} />}
-      {active === "studio" && <StudioView    key={`studio-${resetTick}`} />}
-      {active === "image"  && <ImageGenView  key={`image-${resetTick}`}  onSubmitPrompt={(v) => logToHistory("Image", v)} />}
-      {active === "search" && <SearchView    key={`search-${resetTick}`} onOpenChat={() => setActive("chat")} />}
-      {active === "tasks"  && <TasksView     key={`tasks-${resetTick}`}  onSubmitPrompt={(v) => logToHistory("Task", v)} />}
-      {active === "pdf"    && <ChatPdfView   key={`pdf-${resetTick}`} />}
+      {active === "chat"     && <ChatView      key={`chat-${resetTick}`}   onChip={handleChip} onSessionTitleChange={onSessionTitleChange} />}
+      {active === "studio"   && <StudioView    key={`studio-${resetTick}`} />}
+      {active === "image"    && <ImageGenView  key={`image-${resetTick}`}  onSubmitPrompt={(v) => logToHistory("Image", v)} />}
+      {active === "search"   && <SearchView    key={`search-${resetTick}`} onOpenChat={() => setActive("chat")} />}
+      {active === "tasks"    && <TasksView     key={`tasks-${resetTick}`}  onSubmitPrompt={(v) => logToHistory("Task", v)} />}
+      {active === "pdf"      && <ChatPdfView   key={`pdf-${resetTick}`} />}
+      {active === "settings" && <SettingsView  key={`settings-${resetTick}`} />}
     </AppShell>
   );
 }

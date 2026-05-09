@@ -118,19 +118,13 @@ export function TopBar({ title, onShare, onRename, onExport, onDelete }: TopBarP
           </>
         )}
 
-        {/* Credits + Upgrade pill (hidden on very small widths) */}
-        <button
-          onClick={() => toast("Upgrade", { description: "Pricing coming soon" })}
-          className="group hidden items-center gap-2 rounded-full border border-border bg-background py-1 pl-2.5 pr-1 text-[12px] text-foreground/80 transition-colors hover:bg-accent sm:flex"
-        >
-          <span className="flex items-center gap-1 text-foreground">
-            <Zap className="h-3 w-3" strokeWidth={1.5} fill="currentColor" />
-            <span className="font-mono text-[11px]">30</span>
+        {/* Credits pill (hidden on very small widths) */}
+        <div className="hidden items-center gap-2 rounded-full border border-border bg-background py-1 pl-3 pr-1 text-[12px] text-foreground/80 sm:flex">
+          <span className="flex items-center gap-1 font-medium text-foreground">
+            <span className="font-mono text-[12px]">100</span>
+            <span className="text-foreground/60">Credits</span>
           </span>
-          <span className="rounded-full bg-foreground px-2.5 py-0.5 text-[11px] font-medium text-background">
-            Upgrade
-          </span>
-        </button>
+        </div>
 
         {/* Account avatar + dropdown */}
         <DropdownMenu>
