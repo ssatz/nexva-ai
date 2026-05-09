@@ -1,12 +1,29 @@
 /*
   PricingLanding — public marketing page at /pricing.
-  Strict B&W theme matching /chatpdf and /imagegen.
+  5-tier credit-based pricing (Free / Starter / Standard / Pro / Whale).
+  Strict B&W theme (no blue), Lucide icons throughout.
 */
 
 import { useState } from "react";
 import { MarketingNav, MarketingFooter, SectionHeading } from "@/components/MarketingShell";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronDown, HelpCircle, Sparkles, Building2, X, Minus } from "lucide-react";
+import {
+  ChevronDown,
+  HelpCircle,
+  Sparkles,
+  Zap,
+  Crown,
+  Fish,
+  Minus,
+  Bot,
+  Brain,
+  Atom,
+  Cpu,
+  ImageIcon,
+  Film,
+  Wand2,
+  CircleDot,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -19,7 +36,6 @@ export default function PricingLanding() {
       <MarketingNav active="pricing" />
       <Hero billing={billing} setBilling={setBilling} />
       <Tiers billing={billing} />
-      <Compare />
       <Faq />
       <MarketingFooter />
     </div>
@@ -31,7 +47,7 @@ export default function PricingLanding() {
 function Hero({ billing, setBilling }: { billing: Billing; setBilling: (b: Billing) => void }) {
   return (
     <section
-      className="relative overflow-hidden border-b border-neutral-200 bg-white py-20"
+      className="relative overflow-hidden border-b border-neutral-200 bg-white pt-20 pb-10"
       style={{
         backgroundImage:
           "linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px)",
@@ -40,23 +56,26 @@ function Hero({ billing, setBilling }: { billing: Billing; setBilling: (b: Billi
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white to-transparent" />
       <div className="relative mx-auto max-w-3xl px-6 text-center">
-        <h1 className="text-[44px] font-bold leading-[1.08] tracking-tight md:text-[58px]">
-          <span className="block text-neutral-900">One Subscription.</span>
-          <span className="block italic text-neutral-400">Every Model.</span>
+        <h1 className="text-[44px] font-bold leading-[1.08] tracking-tight md:text-[56px]">
+          <span className="block text-neutral-900">Plans &amp; Credits</span>
         </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-[15.5px] leading-relaxed text-neutral-600">
-          Stop paying for ChatGPT, Claude, Gemini, Midjourney, and Veo separately. Get all the world's best
-          AI models under one Nexva subscription.
+        <p className="mx-auto mt-5 max-w-2xl text-[15.5px] leading-relaxed text-neutral-600">
+          Choose the perfect plan for your study needs. Upgrade anytime as you scale.
         </p>
 
         {/* Billing toggle */}
-        <div className="mx-auto mt-10 inline-flex rounded-full border border-neutral-300 bg-white p-1 text-[13px]">
+        <div className="mx-auto mt-8 inline-flex items-center gap-3 rounded-full border border-neutral-300 bg-white px-2 py-1 text-[13px]">
           <BillingButton active={billing === "monthly"} onClick={() => setBilling("monthly")}>
             Monthly
           </BillingButton>
           <BillingButton active={billing === "yearly"} onClick={() => setBilling("yearly")}>
             Yearly
-            <span className="ml-2 rounded-full bg-neutral-900 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+            <span
+              className={cn(
+                "ml-2 rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
+                billing === "yearly" ? "bg-white text-neutral-900" : "bg-neutral-900 text-white",
+              )}
+            >
               −20%
             </span>
           </BillingButton>
@@ -88,249 +107,226 @@ function BillingButton({
   );
 }
 
-/* ─────────────── Tiers ─────────────── */
+/* ─────────────── Tier data ─────────────── */
 
-const TIERS = [
+const BASIC_MODELS = [
+  { icon: Bot, label: "GPT-4o mini" },
+  { icon: Sparkles, label: "Claude 3.5 Haiku" },
+  { icon: Atom, label: "DeepSeek V3 & R1" },
+];
+
+const ADVANCED_MODELS = [
+  { icon: Brain, label: "o3 & o4-mini" },
+  { icon: Sparkles, label: "Claude 3.7 Sonnet" },
+  { icon: Cpu, label: "Gemini 2.5 Pro" },
+];
+
+const IMAGE_VIDEO_MODELS = [
+  { icon: ImageIcon, label: "DALL·E 3" },
+  { icon: Wand2, label: "Imagen 4 / Flux 1.1" },
+  { icon: Film, label: "Veo 3 / Sora" },
+];
+
+type Tier = {
+  id: string;
+  icon: typeof Sparkles;
+  name: string;
+  monthly: number;
+  yearly: number;
+  monthlyCredits: number;
+  cta: string;
+  current?: boolean;
+  highlight?: boolean;
+  groups: { title: string; items: typeof BASIC_MODELS | { icon: typeof Sparkles; label: string }[] }[];
+};
+
+const TIERS: Tier[] = [
   {
     id: "free",
-    icon: Sparkles,
+    icon: CircleDot,
     name: "Free",
-    tagline: "For trying things out.",
     monthly: 0,
     yearly: 0,
-    cta: "Get Started",
-    highlight: false,
-    features: [
-      "5 chats per day",
-      "5 PDF uploads / month",
-      "10 image generations / month",
-      "Standard models (Gemini Flash Lite, Grok Fast)",
-      "Community support",
+    monthlyCredits: 100,
+    cta: "Current Plan",
+    current: true,
+    groups: [
+      { title: "Basic models", items: BASIC_MODELS },
+      { title: "Advanced models", items: [] as { icon: typeof Sparkles; label: string }[] },
+      { title: "Image / Video models", items: [] as { icon: typeof Sparkles; label: string }[] },
+    ],
+  },
+  {
+    id: "starter",
+    icon: Zap,
+    name: "Starter",
+    monthly: 5,
+    yearly: 4,
+    monthlyCredits: 2200,
+    cta: "Subscribe Now",
+    groups: [
+      { title: "Basic models", items: BASIC_MODELS },
+      { title: "Advanced models", items: ADVANCED_MODELS.slice(0, 2) },
+      { title: "Image / Video models", items: IMAGE_VIDEO_MODELS.slice(0, 1) },
+    ],
+  },
+  {
+    id: "standard",
+    icon: Sparkles,
+    name: "Standard",
+    monthly: 20,
+    yearly: 16,
+    monthlyCredits: 10_000,
+    cta: "Subscribe Now",
+    highlight: true,
+    groups: [
+      { title: "Basic models", items: BASIC_MODELS },
+      { title: "Advanced models", items: ADVANCED_MODELS },
+      { title: "Image / Video models", items: IMAGE_VIDEO_MODELS.slice(0, 2) },
     ],
   },
   {
     id: "pro",
-    icon: Sparkles,
+    icon: Crown,
     name: "Pro",
-    tagline: "For creators & power users.",
-    monthly: 18,
-    yearly: 14,
-    cta: "Upgrade to Pro",
-    highlight: true,
-    features: [
-      "Unlimited chats",
-      "Unlimited PDF uploads (100MB+)",
-      "500 image / video generations / month",
-      "All Pro models (Claude Sonnet, Gemini Pro, Imagen 4, Veo 3)",
-      "4K image exports + 1080p video",
-      "Priority queue + faster latency",
-      "Email + chat support",
+    monthly: 50,
+    yearly: 40,
+    monthlyCredits: 26_000,
+    cta: "Subscribe Now",
+    groups: [
+      { title: "Basic models", items: BASIC_MODELS },
+      { title: "Advanced models", items: ADVANCED_MODELS },
+      { title: "Image / Video models", items: IMAGE_VIDEO_MODELS },
     ],
   },
   {
-    id: "business",
-    icon: Building2,
-    name: "Business",
-    tagline: "For teams & companies.",
-    monthly: 49,
-    yearly: 39,
-    cta: "Talk to Sales",
-    highlight: false,
-    features: [
-      "Everything in Pro",
-      "Shared team workspaces",
-      "SSO + role-based access",
-      "Admin analytics & audit logs",
-      "Custom retention policies",
-      "Dedicated account manager",
-      "99.9% uptime SLA",
-    ],
-  },
-] as const;
-
-function Tiers({ billing }: { billing: Billing }) {
-  return (
-    <section className="border-b border-neutral-200 bg-neutral-50 py-20">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="grid gap-6 md:grid-cols-3">
-          {TIERS.map((t) => (
-            <article
-              key={t.id}
-              className={cn(
-                "relative flex flex-col rounded-2xl border bg-white p-7 transition-all",
-                t.highlight
-                  ? "border-neutral-900 shadow-[0_24px_60px_-25px_rgba(0,0,0,0.45)] md:-translate-y-3"
-                  : "border-neutral-200 hover:border-neutral-400",
-              )}
-            >
-              {t.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
-                  Most Popular
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <t.icon className="h-4 w-4 text-neutral-700" strokeWidth={1.75} />
-                <span className="text-[13.5px] font-semibold uppercase tracking-wide text-neutral-700">
-                  {t.name}
-                </span>
-              </div>
-              <p className="mt-1.5 text-[13.5px] text-neutral-500">{t.tagline}</p>
-
-              <div className="mt-6 flex items-baseline gap-1">
-                <span className="text-[44px] font-bold leading-none tracking-tight">
-                  ${billing === "monthly" ? t.monthly : t.yearly}
-                </span>
-                <span className="text-[13.5px] text-neutral-500">/ month</span>
-              </div>
-              {billing === "yearly" && t.monthly > 0 && (
-                <div className="mt-1 text-[12px] text-neutral-500">
-                  Billed annually at ${t.yearly * 12}
-                </div>
-              )}
-
-              <Button
-                onClick={() => toast(`Selected: ${t.name}`)}
-                className={cn(
-                  "mt-6 h-11 w-full rounded-md text-[13.5px] font-semibold",
-                  t.highlight
-                    ? "bg-neutral-900 text-white hover:bg-neutral-800"
-                    : "bg-white text-neutral-900 border border-neutral-300 hover:bg-neutral-50",
-                )}
-              >
-                {t.cta}
-              </Button>
-
-              <div className="my-6 h-px w-full bg-neutral-200" />
-
-              <ul className="flex-1 space-y-3">
-                {t.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-[13px] text-neutral-700">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-neutral-900" strokeWidth={2.25} />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────── Comparison Matrix ─────────────── */
-
-const ROWS: { group: string; rows: { label: string; free: string | boolean; pro: string | boolean; biz: string | boolean }[] }[] = [
-  {
-    group: "Chat",
-    rows: [
-      { label: "Daily message limit", free: "5 / day", pro: "Unlimited", biz: "Unlimited" },
-      { label: "Pro models (Claude Sonnet, Gemini Pro)", free: false, pro: true, biz: true },
-      { label: "Conversation history search", free: true, pro: true, biz: true },
-    ],
-  },
-  {
-    group: "PDF & Documents",
-    rows: [
-      { label: "Monthly PDF uploads", free: "5", pro: "Unlimited", biz: "Unlimited" },
-      { label: "Max file size", free: "20MB", pro: "100MB+", biz: "100MB+" },
-      { label: "Citations with page numbers", free: true, pro: true, biz: true },
-    ],
-  },
-  {
-    group: "Image & Video",
-    rows: [
-      { label: "Image generations / month", free: "10", pro: "500", biz: "Custom" },
-      { label: "Video generations / month", free: "0", pro: "30", biz: "Custom" },
-      { label: "4K export + 1080p video", free: false, pro: true, biz: true },
-      { label: "Commercial license", free: false, pro: true, biz: true },
-    ],
-  },
-  {
-    group: "Team & Security",
-    rows: [
-      { label: "Shared workspaces", free: false, pro: false, biz: true },
-      { label: "SSO & role-based access", free: false, pro: false, biz: true },
-      { label: "Audit logs", free: false, pro: false, biz: true },
-      { label: "Dedicated account manager", free: false, pro: false, biz: true },
-      { label: "99.9% uptime SLA", free: false, pro: false, biz: true },
+    id: "whale",
+    icon: Fish,
+    name: "Whale",
+    monthly: 100,
+    yearly: 80,
+    monthlyCredits: 55_000,
+    cta: "Subscribe Now",
+    groups: [
+      { title: "Basic models", items: BASIC_MODELS },
+      { title: "Advanced models", items: ADVANCED_MODELS },
+      { title: "Image / Video models", items: IMAGE_VIDEO_MODELS },
     ],
   },
 ];
 
-function Compare() {
+/* ─────────────── Tier cards ─────────────── */
+
+function Tiers({ billing }: { billing: Billing }) {
   return (
-    <section className="border-b border-neutral-200 bg-white py-24">
-      <div className="mx-auto max-w-6xl px-6">
-        <SectionHeading title="Compare Plans" subtitle="Every detail, side by side." />
-
-        <div className="mt-14 overflow-hidden rounded-2xl border border-neutral-200">
-          {/* Header */}
-          <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] border-b border-neutral-200 bg-neutral-50">
-            <div className="px-5 py-4 text-[12px] font-semibold uppercase tracking-wide text-neutral-500">
-              Feature
-            </div>
-            {["Free", "Pro", "Business"].map((n) => (
-              <div
-                key={n}
-                className={cn(
-                  "px-5 py-4 text-center text-[13px] font-bold",
-                  n === "Pro" ? "bg-neutral-900 text-white" : "text-neutral-900",
-                )}
-              >
-                {n}
-              </div>
-            ))}
-          </div>
-
-          {/* Body */}
-          {ROWS.map((g) => (
-            <div key={g.group}>
-              <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] border-b border-neutral-200 bg-neutral-50">
-                <div className="col-span-4 px-5 py-3 text-[11.5px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
-                  {g.group}
-                </div>
-              </div>
-              {g.rows.map((r, i) => (
-                <div
-                  key={r.label}
-                  className={cn(
-                    "grid grid-cols-[1.5fr_1fr_1fr_1fr] items-center",
-                    i !== g.rows.length - 1 && "border-b border-neutral-100",
-                  )}
-                >
-                  <div className="px-5 py-3.5 text-[13px] text-neutral-800">{r.label}</div>
-                  <Cell value={r.free} />
-                  <Cell value={r.pro} highlight />
-                  <Cell value={r.biz} />
-                </div>
-              ))}
-            </div>
+    <section className="bg-neutral-50 py-16">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-5">
+          {TIERS.map((t) => (
+            <TierCard key={t.id} tier={t} billing={billing} />
           ))}
         </div>
+        <p className="mx-auto mt-10 max-w-3xl text-center text-[12.5px] text-neutral-500">
+          All plans include conversation history, citations with page numbers, and standard support.
+          Yearly billing applies a 20% discount on the monthly rate.
+        </p>
       </div>
     </section>
   );
 }
 
-function Cell({ value, highlight }: { value: string | boolean; highlight?: boolean }) {
+function TierCard({ tier, billing }: { tier: Tier; billing: Billing }) {
+  const price = billing === "monthly" ? tier.monthly : tier.yearly;
+  const Icon = tier.icon;
   return (
-    <div
+    <article
       className={cn(
-        "flex items-center justify-center px-5 py-3.5 text-[13px]",
-        highlight && "bg-neutral-50",
+        "relative flex flex-col rounded-2xl border bg-white p-6 transition-all",
+        tier.highlight
+          ? "border-neutral-900 shadow-[0_24px_60px_-25px_rgba(0,0,0,0.45)] lg:-translate-y-3"
+          : "border-neutral-200 hover:border-neutral-400",
       )}
     >
-      {typeof value === "boolean" ? (
-        value ? (
-          <Check className="h-4 w-4 text-neutral-900" strokeWidth={2.25} />
-        ) : (
-          <Minus className="h-4 w-4 text-neutral-300" strokeWidth={2} />
-        )
-      ) : (
-        <span className="text-neutral-800">{value}</span>
+      {tier.highlight && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-neutral-900 px-3 py-1 text-[10.5px] font-semibold uppercase tracking-wide text-white">
+          Most Popular
+        </div>
       )}
-    </div>
+
+      {/* Tier name */}
+      <div className="flex items-center gap-2">
+        <Icon className="h-4 w-4 text-neutral-700" strokeWidth={1.75} />
+        <span className="text-[13px] font-semibold uppercase tracking-wide text-neutral-700">
+          {tier.name}
+        </span>
+      </div>
+
+      {/* Price */}
+      <div className="mt-5">
+        {price === 0 ? (
+          <div className="text-[34px] font-bold leading-none tracking-tight">Free</div>
+        ) : (
+          <div className="flex items-baseline gap-1">
+            <span className="text-[34px] font-bold leading-none tracking-tight">${price}</span>
+            <span className="text-[13.5px] text-neutral-500">/monthly</span>
+          </div>
+        )}
+      </div>
+
+      {/* Credits */}
+      <div
+        className={cn(
+          "mt-3 inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11.5px] font-medium",
+          tier.highlight
+            ? "bg-neutral-900 text-white"
+            : "bg-neutral-100 text-neutral-700",
+        )}
+      >
+        {tier.monthlyCredits.toLocaleString()} Credits / Monthly
+      </div>
+
+      {/* CTA */}
+      <Button
+        onClick={() => !tier.current && toast(`Selected: ${tier.name}`)}
+        disabled={tier.current}
+        className={cn(
+          "mt-5 h-10 w-full rounded-md text-[13px] font-semibold disabled:opacity-100",
+          tier.current
+            ? "bg-white text-neutral-900 border border-neutral-300 hover:bg-white cursor-default"
+            : tier.highlight
+              ? "bg-neutral-900 text-white hover:bg-neutral-800"
+              : "bg-neutral-900 text-white hover:bg-neutral-800",
+        )}
+      >
+        {tier.cta}
+      </Button>
+
+      {/* Groups */}
+      <div className="mt-6 space-y-5">
+        {tier.groups.map((g) => (
+          <div key={g.title}>
+            <div className="text-[12.5px] font-semibold text-neutral-900">{g.title}:</div>
+            <ul className="mt-2 space-y-2">
+              {g.items.length === 0 && (
+                <li className="flex items-center gap-2 text-[12.5px] text-neutral-300">
+                  <Minus className="h-3.5 w-3.5" strokeWidth={2} />
+                  <span>Not included</span>
+                </li>
+              )}
+              {g.items.map((item) => (
+                <li
+                  key={item.label}
+                  className="flex items-center gap-2 text-[12.5px] text-neutral-700"
+                >
+                  <item.icon className="h-3.5 w-3.5 text-neutral-700" strokeWidth={1.75} />
+                  <span>{item.label}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </article>
   );
 }
 
@@ -338,17 +334,36 @@ function Cell({ value, highlight }: { value: string | boolean; highlight?: boole
 
 function Faq() {
   const items = [
-    { q: "Can I switch plans at any time?", a: "Yes. Upgrades take effect immediately, and downgrades apply at the end of your current billing cycle." },
-    { q: "Do unused credits roll over?", a: "Free-tier credits reset monthly. Pro and Business credits reset monthly but unused image-generation credits roll over for one month." },
-    { q: "Is there a refund policy?", a: "We offer a 7-day money-back guarantee on all paid plans. Just email support@nexva.ai." },
-    { q: "Do you offer discounts for students or non-profits?", a: "Yes — 50% off Pro for verified students and registered non-profits. Contact us to apply." },
-    { q: "Can I bring my own API keys?", a: "Business plan customers can bring their own keys for OpenAI, Anthropic, Google, and xAI to use their own quotas." },
+    {
+      q: "How do credits work?",
+      a: "Each request consumes credits depending on the model used. Basic models are cheap; advanced and image/video models cost more. Your monthly credits reset on your billing date.",
+    },
+    {
+      q: "Can I switch plans at any time?",
+      a: "Yes. Upgrades take effect immediately; downgrades apply at the end of your current billing cycle. Unused credits do not transfer between plans.",
+    },
+    {
+      q: "Do unused credits roll over?",
+      a: "Free-tier credits reset monthly. On paid plans, unused credits expire at the end of the billing cycle.",
+    },
+    {
+      q: "Is there a refund policy?",
+      a: "We offer a 7-day money-back guarantee on all paid plans. Email support@nexva.ai with your account details.",
+    },
+    {
+      q: "Do you offer discounts for students or non-profits?",
+      a: "Yes — 50% off on Standard and Pro for verified students and registered non-profits. Reach out to apply.",
+    },
   ];
   return (
-    <section className="border-b border-neutral-200 bg-white py-24">
+    <section className="border-t border-neutral-200 bg-white py-20">
       <div className="mx-auto max-w-3xl px-6">
-        <SectionHeading title="Frequently Asked Questions" subtitle={null} icon={<HelpCircle className="h-4 w-4" strokeWidth={1.75} />} />
-        <div className="mt-12 space-y-3">
+        <SectionHeading
+          title="Frequently Asked Questions"
+          subtitle={null}
+          icon={<HelpCircle className="h-4 w-4" strokeWidth={1.75} />}
+        />
+        <div className="mt-10 space-y-3">
           {items.map((it, i) => (
             <FaqItem key={i} q={it.q} a={it.a} />
           ))}
@@ -362,14 +377,22 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="rounded-xl border border-neutral-200 bg-white">
-      <button onClick={() => setOpen((v) => !v)} className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+      >
         <span className="text-[14.5px] font-semibold text-neutral-900">{q}</span>
-        <ChevronDown className={cn("h-4 w-4 text-neutral-500 transition-transform duration-200", open && "rotate-180")} strokeWidth={2} />
+        <ChevronDown
+          className={cn(
+            "h-4 w-4 text-neutral-500 transition-transform duration-200",
+            open && "rotate-180",
+          )}
+          strokeWidth={2}
+        />
       </button>
-      {open && <div className="px-5 pb-4 text-[13.5px] leading-relaxed text-neutral-600">{a}</div>}
+      {open && (
+        <div className="px-5 pb-4 text-[13.5px] leading-relaxed text-neutral-600">{a}</div>
+      )}
     </div>
   );
 }
-
-// silence unused import lint for X (kept for future close buttons)
-void X;
