@@ -6,6 +6,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import ChatPdfLanding from "./pages/ChatPdfLanding";
+import ImageGenLanding from "./pages/ImageGenLanding";
+import PricingLanding from "./pages/PricingLanding";
 
 
 function Router() {
@@ -13,6 +15,8 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/chatpdf"} component={ChatPdfLanding} />
+      <Route path={"/imagegen"} component={ImageGenLanding} />
+      <Route path={"/pricing"} component={PricingLanding} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
